@@ -1,0 +1,3 @@
+3.0.0 - 2018-05-22
+- MONM2P34-20: implement recurring payments for credit card method
+- MONM2P34-31: remove unrelated code, remove CH core module from dependency list

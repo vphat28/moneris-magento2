@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Moneris_CreditCard::moneris" title="Moneris" translate="title" module="Moneris_CreditCard" sortOrder="50" parent="Magento_Sales::sales" resource="Moneris_CreditCard::moneris"/>
+        <add id="Moneris_CreditCard::moneris_recurring_payments" title="Recurring Payments" translate="title" module="Moneris_CreditCard" sortOrder="50" parent="Moneris_CreditCard::moneris" action="moneris/recurringpayment" resource="Moneris_CreditCard::moneris_recurring_payments"/>
+    </menu>
+</config>

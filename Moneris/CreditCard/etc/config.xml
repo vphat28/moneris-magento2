@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <chmoneris>
+                <model>Moneris\CreditCard\Model\Method\Payment</model>
+                <enable_vault>0</enable_vault>
+            </chmoneris>
+            <chmoneriscc>
+                <model>Moneris\CreditCard\Model\Method\Payment</model>
+                <active>0</active>
+                <cctypes>AE,VI,MC,DI</cctypes>
+                <debug>0</debug>
+                <test>1</test>
+                <title>Moneris OnSite Credit Card Processing Provided by CollinsHarper.com</title>
+                <payment_action>authorize</payment_action>
+                <allowspecific>0</allowspecific>
+                <currency>CAD</currency>
+                <create_order_before>1</create_order_before>
+                <date_delim>/</date_delim>
+                <ccfields>pan,expdate,expiry,cvd_info</ccfields>
+                <use_customer_name>1</use_customer_name>
+                <cvdsuccess>X,Y,A,W,Z,B,C,D,I,P,M,U,S</cvdsuccess>
+                <avssuccess>A,B,C,D,G,I,M,N,P,R,S,T,U,W,X,Y,Z</avssuccess>
+                <responses>AVS:FAILED:Transaction Failed AVS Match, please check billing information.
+50:DECLINED:Your transaction was declined by the merchant bank. Please try another card
+476:DECLINED:(valid decline)  Your transaction was declined by the merchant bank. Please try another card. Or call your bank.
+51:FAILED:I do not know if 51 is valid or not.
+52:DECLINED:All these should be numeric response: DECLINED : then a message. they all must be declined though.</responses>
+                <vbv_enabled>0</vbv_enabled>
+                <require_vbv>0</require_vbv>
+            </chmoneriscc>
+            
+            <chmonerisredirect>
+                <active>0</active>
+                <use_iframe>0</use_iframe>
+                <model>Moneris\CreditCard\Model\Method\Hosted</model>
+                <payment_action>authorize_capture</payment_action>
+                <title>Moneris Hosted Integration Provided by CollinsHarper.com</title>
+                <test_mode>1</test_mode>
+                <allowspecific>0</allowspecific>
+                <cctypes>AE,VI,MC,DI</cctypes>
+             </chmonerisredirect>
+             
+             <chmonerisinterac>
+                <active>0</active>
+                <model>Moneris\CreditCard\Model\Method\Interac</model>
+                <title>Moneris Interac Online Provided by CollinsHarper.com</title>
+                <test_mode>1</test_mode>
+                <allowspecific>0</allowspecific>
+                <cctypes>AE,VI,MC,DI</cctypes>
+                <payment_action>authorize_capture</payment_action>
+             </chmonerisinterac>
+             
+        </payment>
+    </default>
+
+</config>

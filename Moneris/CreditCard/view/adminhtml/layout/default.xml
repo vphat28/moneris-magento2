@@ -1,0 +1,20 @@
+<!--
+/**
+ * Copyright © 2015 Collins Harper. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+    <body>
+
+        <referenceContainer name="footer">
+            <block class="Magento\Framework\View\Element\Template" name="support" as="support" template="Moneris_CreditCard::page/support.phtml">
+                <arguments>
+                    <argument name="support_url" xsi:type="string"><![CDATA[https://www.collinsharper.com/magentohelp/open.php?utm_campaign=magento2AdminFooter&utm_medium=core_module&utm_source=footerSupport]]></argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>
+

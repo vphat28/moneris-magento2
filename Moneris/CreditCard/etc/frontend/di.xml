@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Payment\Model\CcGenericConfigProvider">
+        <arguments>
+            <argument name="methodCodes" xsi:type="array">
+                <item name="chmonerisredirect" xsi:type="string">chmonerisredirect</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="chmoneriscc_config_provider" xsi:type="object">Moneris\CreditCard\Model\ConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
+    
+    <type name="Magento\Framework\App\RouterList">
+        <arguments>
+            <argument name="routerList" xsi:type="array">
+                <item name="moneriscustomrouter" xsi:type="array">
+                    <item name="class" xsi:type="string">Moneris\CreditCard\Controller\Router</item>
+                    <item name="disable" xsi:type="boolean">false</item>
+                    <item name="sortOrder" xsi:type="string">22</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Moneris\CreditCard\Block\Frontend\Success">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Moneris\CreditCard\Block\Mycards\Listing">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Moneris\CreditCard\Block\Mycards\Edit">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Moneris\CreditCard\Block\Frontend\AbstractBlock">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session</argument>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Moneris\CreditCard\Controller\Interac\Nonfunded">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session</argument>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Moneris\CreditCard\Controller\Interac">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session</argument>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Moneris\CreditCard\Controller\Index\AbstractController">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session</argument>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Moneris\CreditCard\Controller\Hosted">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session</argument>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Moneris\CreditCard\Controller\AbstractMycards">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Moneris\CreditCard\Model\VaultPayment">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Moneris\CreditCard\Model\AbstractModel">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Moneris\CreditCard\Model\ConfigProvider">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session</argument>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session</argument>
+        </arguments>
+    </type>
+
+</config>

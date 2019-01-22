@@ -1,0 +1,97 @@
+<?php
+/**
+ * Copyright © 2016 CollinsHarper. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+/** @var \Moneris\CreditCard\Block\Mycards\Listing $block */
+$_tokens = $block->getActiveTokensList();
+$_defaultToken = $block->getDefaultToken();
+?>
+<?php if ($_tokens->getSize()>0) : ?>
+    <div class="table-wrapper">
+        <table class="data table">
+            <caption class="table-caption">
+                <?php  echo __('My Credit Cards') ?>
+            </caption>
+            <thead>
+            <tr>
+                <th scope="col" class="col id"><?php  echo __('Card Type') ?></th>
+                <th scope="col" class="col date"><?php  echo __('Card Number') ?></th>
+                <th scope="col" class="col shipping">
+                    <?php  echo __('Expiration Date') ?>
+                </th>
+                <th scope="col" class="col actions">&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($_tokens as $_id => $_token) : ?>
+            <?php /** @var \Moneris\CreditCard\Model\Vault $_token */ ?>
+                <tr>
+                    <td data-th="<?php  echo __('Card Type') ?>" class="col">
+                        <?php  echo $block->getMapCardType($_token->getCardType()) ?>
+                    </td>
+                    <td data-th="<?php  echo __('Card Number') ?>" class="col">
+                        <?php  echo $_token->getCcLast() ?>
+                    </td>
+                    <td data-th="<?php  echo __('Expiration Date') ?>" class="col">
+                        <?php 
+                            echo sprintf('%s / %s', $_token->getCcExpMonth(), $_token->getCcExpYear()) ?>
+                    </td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Actions')) ?>" class="col actions">
+                         <a href="<?php echo $block->getEditTokenUrl($_id) ?>" 
+                               class="action">
+                                <span><?php echo __('Edit') ?></span>
+                            </a>
+                        <?php if ($block->isHostedVault()) : ?>
+                        <a href="<?php echo $block->getEditHostedTokenUrl($_id) ?>" 
+                               class="action">
+                                <span><?php echo __('Edit by Hosted') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        <a href="<?php echo $block->getDeleteTokenUrl($_id) ?>"
+                           onclick="return confirm('<?php 
+                                            echo __('Are you sure you want to delete this card?') ?>');"
+                           class="action">
+                            <span><?php  echo __('Delete') ?></span>
+                        </a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+<?php else : ?>
+    <div class="message info empty">
+        <span><?php  echo __("You haven't had any saved credit cards."); ?></span>
+    </div>
+<?php endif ?>
+<div class="actions-toolbar">
+    <div class="primary">
+        <button type="button" title="<?php  echo __('Add New Credit Card') ?>"
+                class="action primary add" onclick="window.location.href='<?php
+                         echo $block->getCreateTokenUrl() ?>'">
+            <span><?php  echo __('Add New Credit Card') ?></span>
+        </button>
+    </div>
+    <?php if ($block->isHostedVault()) : ?>
+    <div class="secondary">
+        <form method="post" action="https://esqa.moneris.com/HPPDP/index.php" >
+            <input type="hidden" name="res_id" value=<?php echo $block->getHostedVaultResId();?>>
+            <input type="hidden" name="res_key" value="<?php echo $block->getHostedVaultResKey();?>">
+            <input type="hidden" name="cc_crypt_type" value="7">
+            <input type="hidden" name="lang" value="en-ca">
+            <input type="hidden" name="cust_id" value="<?php echo $block->getCustomerData()->getId();?>">
+            <input type="hidden" name="email" value="<?php echo $block->getCustomerData()->getEmail();?>">
+          
+            <button type="SUBMIT" title="<?php  echo __('Add New Credit Card use Hosted Vault') ?>"
+                    class="action secondary add" onclick="window.location.href='<?php
+                             echo $block->getCreateTokenUrl() ?>'">
+                <span><?php  echo __('Add New Credit Card (Hosted Vault)') ?></span>
+            </button>
+        </form>
+    </div>
+    <?php
+    endif;
+    ?>
+</div>
+

@@ -1,0 +1,154 @@
+<?php
+/**
+ * Copyright © 2016 CollinsHarper. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+/**
+ * @var $block \Magento\Customer\Block\Address\Edit
+ */
+?>
+
+<?php $token = $block->token?>
+<?php if ($token->getVaultId()):?>
+    <div class="cybersource-card-info">
+        <h3><?php echo __('Card Information')?></h3>
+        <ul>
+            <li><span style="min-width: 150px; display: inline-block;"><?php echo __('Card Number')?></span><?php echo $token->getData('cc_last')?></li>
+            <li><span style="min-width: 150px; display: inline-block;"><?php echo __('Expiration Date')?></span><?php echo $token->getData('card_expire')?></li>    
+        </ul>
+    </div>
+<?php endif;?>
+ <?php if ($block->isHostedVault()) : ?>
+ <fieldset class="fieldset">
+    <div class="secondary">
+        <form method="post" action="https://esqa.moneris.com/HPPDP/index.php" >
+            <input type="hidden" name="res_id" value=<?php echo $block->getHostedVaultResId();?>>
+            <input type="hidden" name="res_key" value="<?php echo $block->getHostedVaultResKey();?>">
+            <input type="hidden" name="cc_crypt_type" value="7">
+            <input type="hidden" name="lang" value="en-ca">
+            <input type="hidden" name="data_key" value="<?php echo $block->getAdditional('data_key');?>">
+            <input type="hidden" name="cust_id" value="<?php echo $block->getAdditional('customer_id');?>">
+            <input type="hidden" name="email" value="<?php echo $block->getAdditional('customer_email');?>">
+            <input type="hidden" name="form_key" value="<?php echo $block->escapeQuote($block->getFormKey()); ?>">
+
+            <button type="SUBMIT" title="<?php  echo __('Continue edit Credit Card use Hosted Vault') ?>"
+                    class="action secondary add">
+                <span><?php  echo __('Continue Edit Credit Card (Hosted Vault)') ?></span>
+            </button>
+        </form>
+    </div>
+</fieldset>
+    <?php
+    else :
+    ?>
+<form id="form-create-token" class="form-address-edit" action="<?php  echo $block->getSubmitUrl() ?>" method="post" id="form-validate" enctype="multipart/form-data" data-hasrequired="<?php  echo __('* Required Fields') ?>" data-mage-init='{"validation": {}}'>
+    <?php if ($token->getVaultId()):?>
+        <input type="hidden" name="payment[data_key]" value="<?php echo $token->getData('data_key') ?>" >
+        <input type="hidden" name="vailt_id" value="<?php echo $token->getVaultId() ?>" >
+    <?php endif;?>
+    <fieldset class="fieldset">
+    </fieldset>
+    <fieldset class="fieldset">
+    </fieldset>
+    <fieldset class="fieldset">
+        <!-- cc_number -->
+        <div class="field cc_number required">
+            <label class="label" for="cc_number">
+                <span><?php  echo __('Credit Card Number'); ?></span>
+            </label>
+            <div class="control">
+                <input type="number" value="<?php echo $token->getData('cc_last') ?>" 
+                name="payment[cc_number]" class="input-text required-entry validate-cc-number" 
+                data-validate='{"required-number":true}'
+                id="cc_number" title="Credit Card Number" >
+            </div>
+        </div>
+
+        <div class="field type required">
+            <label for="cc-type" class="label"><span><?php echo __('CC Type') ?></span></label>
+            <div class="control">
+                <select id="cc-type"
+                        name="payment[cc_type]" data-validate='{required:true}' class="select">
+                    <option value=""><?php echo __('--Please Select--')?></option>
+                    <?php $_ccType = $block->getAdditional('card_type') ?>
+                    <?php foreach ($block->getCcBlock()->getCcAvailableTypes() as $_typeCode => $_typeName): ?>
+                        <option value="<?php echo $_typeCode ?>"<?php if ($_typeCode == $_ccType): ?> selected="selected"<?php endif ?>><?php echo $_typeName ?></option>
+                    <?php endforeach ?>
+                </select>
+            </div>
+        </div>
+        <!-- expiration -->
+        <div class="field required">
+            <label class="label" for="expiration">
+                <span><?php echo __('Expiration Date') ?></span>
+            </label>
+            <div class="control">
+                <div class="fields group group-2">
+                    <div class="field no-label month">
+                        <div class="control">
+                            <select name="payment[cc_exp_month]" id="cc_exp_month" class="select select-month required-entry" 
+                            data-validate='{required:true}'>
+                            <?php $_ccExpMonth = $block->getAdditional('cc_exp_month'); ?>
+                                <?php foreach ($block->getCcBlock()->getCcMonths() as $k => $v): ?>
+                                    <option value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field no-label year">
+                        <div class="control">
+                            <select name="payment[cc_exp_year]"  id="cc_exp_year"
+                            data-validate='{required:true}'
+                            class="select select-year required-entry">
+                            <?php $_ccExpYear = $block->getAdditional('cc_exp_year'); ?>
+                            <?php foreach ($block->getCcBlock()->getCcYears() as $k => $v): ?>
+                                    <option value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccExpYear): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                            <?php endforeach ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- cc_number -->
+        <div class="field cc_number required">
+            <label class="label" for="cc_cid">
+                <span><?php echo __('Card Verification Number')?></span>
+            </label>
+            <div class="control">
+                <input type="number" data-validate='{"required-number":true}' name="payment[cc_cid]" class="input-text required-entry validate-cc-cvn"  id="cc_cid" title="Card Verification Number" >
+            </div>
+        </div>
+    </fieldset>
+    
+    <div class="actions-toolbar">
+        <?php if(!$block->getUseIframe()):?>
+        <div class="primary">
+            <button type="submit" class="action save primary" data-action="save-address" title="<?php  echo __('Save Credit Card') ?>">
+                <span><?php  echo __('Continue') ?></span>
+            </button>
+        </div>
+        <div class="secondary">
+            <a class="action back" href="<?php echo $block->escapeUrl($block->getBackUrl()) ?>"><span><?php  echo __('Go back') ?></span></a>
+        </div>
+        <?php else:?>
+            <div class="primary">
+                <button id="submit-token-with-iframe" type="button" class="action save primary" title="<?php  echo __('Save Credit Card') ?>">
+                    <span><?php  echo __('Continue') ?></span>
+                </button>
+            </div>
+        <?php endif;?>
+    </div>
+    <input type="hidden" name="form_key" value="<?php echo $block->escapeQuote($block->getFormKey()); ?>">
+</form>
+
+<script type="text/javascript">
+require([
+    'jquery',
+    'mage/mage'
+], function($){
+   var dataForm = $('#form-create-token');
+   dataForm.mage('validation', {});
+});
+</script>
+<?php endif; ?>

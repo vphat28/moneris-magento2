@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Payment Method Facade configuration -->
+    <virtualType name="CollinsHarperMasterpassFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Moneris\Masterpass\Model\Ui\ConfigProvider::MCODE</argument>
+            <argument name="formBlockType" xsi:type="string">Moneris\Masterpass\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Moneris\Masterpass\Block\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MasterpassValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MasterpassCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <!-- Configuration reader -->
+    <type name="Moneris\Masterpass\Gateway\Config\Config">
+        <arguments>
+            <argument name="pathPattern" xsi:type="const">Magento\Payment\Gateway\Config\Config::DEFAULT_PATH_PATTERN</argument>
+            <argument name="methodCode" xsi:type="const">Moneris\Masterpass\Model\Ui\ConfigProvider::MCODE</argument>
+        </arguments>
+    </type>
+    <!-- Commands infrastructure -->
+    <virtualType name="MasterpassCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">MasterpassAuthorizeCommand</item>
+                <item name="capture" xsi:type="string">MasterpassCaptureCommand</item>
+                <item name="refund" xsi:type="string">MasterpassRefundCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- Authorize command -->
+    <virtualType name="MasterpassAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Moneris\Masterpass\Gateway\Request\Authorize</argument>
+            <argument name="transferFactory" xsi:type="object">Moneris\Masterpass\Service\SoapApi</argument>
+            <argument name="client" xsi:type="object">Moneris\Masterpass\Service\SoapApi\TransactionAuthorize</argument>
+            <argument name="handler" xsi:type="object">Moneris\Masterpass\Gateway\Response\AuthorizeHandler</argument>
+        </arguments>
+    </virtualType>
+    <!-- Capture command -->
+    <virtualType name="MasterpassCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Moneris\Masterpass\Gateway\Request\Capture</argument>
+            <argument name="transferFactory" xsi:type="object">Moneris\Masterpass\Service\SoapApi</argument>
+            <argument name="client" xsi:type="object">Moneris\Masterpass\Service\SoapApi\TransactionSale</argument>
+            <argument name="handler" xsi:type="object">Moneris\Masterpass\Gateway\Response\CaptureHandler</argument>
+        </arguments>
+    </virtualType>
+    <!-- Refund command -->
+    <virtualType name="MasterpassRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Moneris\Masterpass\Gateway\Request\Refund</argument>
+            <argument name="validator" xsi:type="object">Moneris\Masterpass\Gateway\Validator\Refund</argument>
+            <argument name="transferFactory" xsi:type="object">Moneris\Masterpass\Service\SoapApi</argument>
+            <argument name="client" xsi:type="object">Moneris\Masterpass\Service\SoapApi\TransactionRefund</argument>
+            <argument name="handler" xsi:type="object">Moneris\Masterpass\Gateway\Response\RefundHandler</argument>
+        </arguments>
+    </virtualType>
+    
+    <virtualType name="MasterpassValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MasterpassConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    
+    <virtualType name="MasterpassConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">Moneris\Masterpass\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+</config>

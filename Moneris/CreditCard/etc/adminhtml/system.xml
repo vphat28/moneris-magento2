@@ -1,0 +1,401 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Collins Harper. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+        <group id="moneris" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Moneris Payments</label>
+            <comment><![CDATA[<b>Please contact Moneris to set up your merchant account and mention configuration code ECNP-00228. It will facilitate the onboarding process.</b>]]></comment>
+            <group id="chmoneris" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Moneris Basic Settings - Provided by CollinsHarper.com</label>
+                    <field id="enable_vault" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enable Vault</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    
+                    <field id="hosted_vault" translate="label" type="select" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enable Hosted Vault</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends>
+                                <field id="enable_vault">1</field>
+                         </depends>
+                    </field>
+    				
+                    <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Store ID</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                                <field id="enable_vault">1</field>
+                         </depends>
+                    </field>
+                    <field id="password" translate="label" type="obscure" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>API Token</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                                <field id="enable_vault">1</field>
+                         </depends>
+                    </field>
+                    
+                    <field id="res_id" translate="label" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Hosted Vault Res Id</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                                <field id="hosted_vault">1</field>
+                                <field id="enable_vault">1</field>
+                         </depends>
+                    </field>
+                    <field id="res_key" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Hosted Vault Res Key</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                                <field id="hosted_vault">1</field>
+                                <field id="enable_vault">1</field>
+                         </depends>
+                    </field>
+                </group>
+                <group id="chmoneriscc" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Moneris Onsite Credit Card - Provided by CollinsHarper.com</label>
+                    <field id="active" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Title</label>
+                    </field>
+                    <field id="usapi" translate="label_tooltip" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Use US API</label>
+                        <tooltip>If you are a US Corporation taking USD payments this should be set to yes. This is not for a Canadian Corporation taking USD.</tooltip>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="is_recurring" translate="label" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enable Recurring</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="recurring_term" translate="label" type="multiselect" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Supported Recurring Terms</label>
+                        <source_model>Moneris\CreditCard\Model\Source\RecurringTerms</source_model>
+                        <depends>
+                            <field id="is_recurring">1</field>
+                        </depends>
+                    </field>
+                    <field id="sftp_login" translate="label" type="obscure" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>SFTP Login</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                            <field id="is_recurring">1</field>
+                        </depends>
+                    </field>
+                    <field id="sftp_password" translate="label" type="obscure" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>SFTP Password</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                            <field id="is_recurring">1</field>
+                        </depends>
+                    </field>
+                    <field id="cctypes" translate="label" type="multiselect" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Credit Card Types</label>
+                        <source_model>Moneris\CreditCard\Model\Source\Cctype</source_model>
+                        <config_path>payment/chmoneriscc/cctypes</config_path>
+                    </field>
+
+                    <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Store ID</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    </field>
+                    <field id="password" translate="label" type="obscure" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>API Token</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    </field>
+
+                    <field id="min_order_total" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Minimum Order Total</label>
+                    </field>
+                    <field id="max_order_total" translate="label" type="text" sortOrder="38" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Maximum Order Total</label>
+                    </field>
+
+                    <field id="test" translate="label" type="select" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Test Mode</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="debug" translate="label_tooltip" type="select" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Debug Mode</label>
+                        <tooltip>Will log detailed information, this feature is not PCI compliant.</tooltip>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="vbv_enabled" translate="label_tooltip" type="select" sortOrder="48" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enable VBV / 3DS</label>
+                        <tooltip>If a customers Visa or MasterCard supports VBV or 3DS and the gateway indicates it; the user will be redirected for additional security validation in an attempt to shifting chargeback liability from the merchant to the card issuer.</tooltip>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="require_vbv" translate="label_tooltip" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Require VBV / 3DS</label>
+                        <tooltip>Visas and Mastercards not enrolled in VBV/3DS will be rejected, ensuring that all chargeback liability is shifted to the card issuer.</tooltip>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="useccv" translate="label_tooltip" type="select" sortOrder="54" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Send CVD Info</label>
+                        <tooltip>Ensure to contact Moneris and verify your account has CVD enabled.</tooltip>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="cvdsuccess" translate="label" type="text" sortOrder="57" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>The CVD code returned must be in this list to be a successful transaction.</label>
+                    </field>
+
+                    <field id="avszip" translate="label_tooltip" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Send Postal Code for AVS</label>
+                        <tooltip>Ensure to contact Moneris and verify your account has AVS enabled.</tooltip>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="avssuccess" translate="label" type="text" sortOrder="64" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>The AVS code returned must be in this list to be a successful transaction.</label>
+                    </field>
+
+                    <field id="allowspecific" translate="label" type="allowspecific" sortOrder="79" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Payment from Applicable Countries</label>
+                        <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                    </field>
+
+
+                    <field id="specificcountry" translate="label" type="multiselect" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Payment from Specific Countries</label>
+                        <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    </field>
+
+                    <field id="responses" translate="label" type="textarea" sortOrder="82" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Response text override.</label>
+                    </field>
+
+                    <field id="use_customer_name" translate="label_tooltip" type="select" sortOrder="84" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Customer Name for ID</label>
+                        <tooltip>Use the customers name to generate a unique ID to send to moneris (* instead of only the Customer ID.</tooltip>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="payment_action" translate="label_tooltip" type="select" sortOrder="84" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Payment Action</label>
+                        <source_model>Moneris\CreditCard\Model\Source\PaymentAction</source_model>
+                    </field>
+    				<field id="order_status" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>New Order Status</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+                    </field>
+                    <field id="sort_order" translate="label" type="text" sortOrder="888" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Sort Order</label>
+                        <frontend_class>validate-number</frontend_class>
+                    </field>
+                </group>
+                
+                <group id="chmonerisredirect" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Moneris Hosted Integration Provided by CollinsHarper.com</label>
+                    
+                    <field id="active" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Title</label>
+                    </field>
+                    
+                    <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Onsite Store ID</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                                <field id="active">1</field>
+                         </depends>
+    					 <comment>OPTIONAL: Used for completing transactions not supported by Hosted paypage.</comment>
+                    </field>
+                    <field id="password" translate="label" type="obscure" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Onsite API Token</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                                <field id="active">1</field>
+                         </depends>
+    					 <comment>OPTIONAL: Used for completing transactions not supported by Hosted paypage.</comment>
+                    </field>
+                    
+                    <field id="ps_store_id" translate="label" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Ps Store ID</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                                <field id="active">1</field>
+                         </depends>
+    					 <comment>Hosted Pay Page Store ID.</comment>
+                    </field>
+                    <field id="hpp_key" translate="label" type="obscure" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>HPP Key</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                                <field id="active">1</field>
+                         </depends>
+    					 <comment>Hosted Paypage API token.</comment>
+                    </field>
+
+                    <field id="vbv_enabled" translate="label_tooltip" type="select" sortOrder="48" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enable VBV / 3DS</label>
+                        <tooltip>If a customers Visa or MasterCard supports VBV or 3DS and the gateway indicates it; the user will be redirected for additional security validation in an attempt to shifting chargeback liability from the merchant to the card issuer.</tooltip>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="require_vbv" translate="label_tooltip" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Require VBV / 3DS</label>
+                        <tooltip>Visas and Mastercards not enrolled in VBV/3DS will be rejected, ensuring that all chargeback liability is shifted to the card issuer.</tooltip>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    
+                    <field id="test" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Test Mode</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="order_status" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0" >
+                        <label>New Order Status</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+                    </field>
+                    <field id="payment_action" translate="label_tooltip" type="select" sortOrder="84" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Payment Action</label>
+                        <source_model>Moneris\CreditCard\Model\Source\HostedPaymentAction</source_model>
+                    </field>
+                    
+                    <field id="debug" translate="label_tooltip" type="select" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Debug Mode</label>
+                        <tooltip>Will log detailed information, this feature is not PCI compliant.</tooltip>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                </group>
+                
+                <group id="chmonerisinterac" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Moneris Interac Online Provided by CollinsHarper.com</label>
+                    
+                    <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Title</label>
+                    </field>
+                    
+                    <field id="login" translate="label" type="obscure" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Store ID</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                                <field id="active">1</field>
+                         </depends>
+                    </field>
+                    <field id="password" translate="label" type="obscure" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>API Token</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                                <field id="active">1</field>
+                         </depends>
+                    </field>
+                    <field id="merchant_id" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Merchant ID</label>
+                        <depends>
+                                <field id="active">1</field>
+                         </depends>
+                    </field>
+                    <field id="environment" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Payment Environment</label>
+                        <source_model>Moneris\CreditCard\Model\Source\PaymentEnvironment</source_model>
+                    </field>
+                    <field id="order_status" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>New Order Status</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+                    </field>
+                    <field id="allowspecific" translate="label" type="allowspecific" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Payment from Applicable Countries</label>
+                        <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                    </field>
+                    <field id="specificcountry" translate="label" type="multiselect" sortOrder="61" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Payment from Specific Countries</label>
+                        <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    </field>
+                    <field id="payment_action" translate="label_tooltip" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Payment Action</label>
+                        <source_model>Moneris\CreditCard\Model\Source\PaymentAction</source_model>
+                    </field>
+                </group>
+                <group id="chmasterpass" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Moneris Masterpass by CollinsHarper</label>
+                    <field id="active" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/chmasterpass/active</config_path>
+                    </field>
+                    <field id="title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="1">
+                        <label>Title</label>
+                        <config_path>payment/chmasterpass/title</config_path>
+                    </field>
+                    <field id="store_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Store ID</label>
+                        <config_path>payment/chmasterpass/store_id</config_path>
+                    </field>
+                    <field id="api_token" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>API Token</label>
+                        <config_path>payment/chmasterpass/api_token</config_path>
+                    </field>
+                    <field id="proc_country" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Proc Country</label>
+                        <config_path>payment/chmasterpass/proc_country</config_path>
+                        <source_model>Moneris\Masterpass\Model\Source\ProcCountry</source_model>
+                    </field>
+                    <field id="test_mode" translate="label_tooltip" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Test Mode</label>
+                        <config_path>payment/chmasterpass/test_mode</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="payment_action" translate="label_tooltip" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Payment Action</label>
+                        <source_model>Moneris\Masterpass\Model\Source\PaymentAction</source_model>
+                    </field>
+                    <field id="sort_order" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="0" showInStore="1">
+                        <label>Sort Order</label>
+                        <config_path>payment/chmasterpass/sort_order</config_path>
+                    </field>
+                </group>
+                <group id="chvisa" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Moneris Visa Checkout</label>
+                    <field id="active" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/chvisa/active</config_path>
+                    </field>
+
+                    <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Title</label>
+                        <config_path>payment/chvisa/title</config_path>
+                    </field>
+
+                    <field id="test" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Test Mode?</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/chvisa/test</config_path>
+                    </field>
+
+                    <field id="api_key" translate="label" type="obscure" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>API Key</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <validate>required-entry</validate>
+                        <config_path>payment/chvisa/api_key</config_path>
+                    </field>
+
+    <!--                <field id="payment_action" type="select" showInDefault="1" showInWebsite="1" sortOrder="110" translate="label">
+                        <label>Payment Action</label>
+                        <source_model>Moneris\VisaCheckout\Model\Adminhtml\Source\PaymentAction</source_model>
+                        <config_path>payment/chvisa/payment_action</config_path>
+                    </field>-->
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

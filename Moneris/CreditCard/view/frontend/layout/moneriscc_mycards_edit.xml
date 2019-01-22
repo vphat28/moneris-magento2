@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Collins Harper. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="Moneris\CreditCard\Block\Mycards\Edit"
+                   name="moneriscc.mycards.edit"
+                   template="mycards/edit.phtml" cacheable="false" />
+            <block class="Magento\Customer\Block\Account\Dashboard"
+                   name="customer.account.link.back"
+                   template="account/link/back.phtml" cacheable="false"/>
+        </referenceContainer>
+    </body>
+</page>

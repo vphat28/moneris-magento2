@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="\Magento\Payment\Gateway\Command\CommandPoolInterface" type="\Magento\Payment\Gateway\Command\CommandPool" />
+
+    <!-- Payment Method Facade configuration -->
+    <virtualType name="VisaCheckoutPaymentGatewayFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">\Moneris\VisaCheckout\Model\Ui\ConfigProvider::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">VisaCheckoutPaymentGatewayValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">VisaCheckoutPaymentGatewayCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Configuration reader -->
+    <type name="Moneris\VisaCheckout\Gateway\Config\Config">
+        <arguments>
+            <argument name="pathPattern" xsi:type="const">Magento\Payment\Gateway\Config\Config::DEFAULT_PATH_PATTERN</argument>
+            <argument name="methodCode" xsi:type="const">Moneris\VisaCheckout\Model\Ui\ConfigProvider::CODE</argument>
+        </arguments>
+    </type>
+
+    <!-- Commands infrastructure -->
+    <virtualType name="VisaCheckoutPaymentGatewayCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">VisaCheckoutPaymentGatewayAuthorizeCommand</item>
+                <!--<item name="capture" xsi:type="string">VisaCheckoutCaptureStrategyCommand</item>-->
+                <item name="capture" xsi:type="string">VisaCheckoutPaymentGatewayCaptureCommand</item>
+                <item name="sale" xsi:type="string">VisaCheckoutSaleCommand</item>
+                <item name="void" xsi:type="string">VisaCheckoutPaymentGatewayVoidCommand</item>
+                <item name="cancel" xsi:type="string">VisaCheckoutPaymentGatewayVoidCommand</item>
+                <item name="refund" xsi:type="string">VisaCheckoutPaymentGatewayRefundCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="VisaCheckoutCaptureStrategyCommand" type="Moneris\VisaCheckout\Gateway\Command\CaptureStrategyCommand">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">VisaCheckoutPaymentGatewayCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorize command -->
+    <virtualType name="VisaCheckoutPaymentGatewayAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Moneris\VisaCheckout\Gateway\Request\AuthorizationRequest</argument>
+            <argument name="handler" xsi:type="object">Moneris\VisaCheckout\Gateway\Response\AuthorizeResponseHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Moneris\VisaCheckout\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">Moneris\VisaCheckout\Gateway\Validator\ResponseCodeValidator</argument>
+            <argument name="client" xsi:type="object">Moneris\VisaCheckout\Gateway\Http\Client\Client</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorization Request -->
+    <type name="Moneris\VisaCheckout\Gateway\Request\AuthorizationRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">Moneris\VisaCheckout\Gateway\Config\Config</argument>
+        </arguments>
+    </type>
+
+    <!-- Capture command -->
+    <virtualType name="VisaCheckoutPaymentGatewayCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Moneris\VisaCheckout\Gateway\Request\CaptureRequest</argument>
+            <argument name="handler" xsi:type="object">Moneris\VisaCheckout\Gateway\Response\CaptureResponseHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Moneris\VisaCheckout\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">Moneris\VisaCheckout\Gateway\Validator\ResponseCodeValidator</argument>
+            <argument name="client" xsi:type="object">Moneris\VisaCheckout\Gateway\Http\Client\Client</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Capture Request -->
+    <type name="Moneris\VisaCheckout\Gateway\Request\CaptureRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">Moneris\VisaCheckout\Gateway\Config\Config</argument>
+        </arguments>
+    </type>
+
+    <!-- Sale command -->
+    <virtualType name="VisaCheckoutSaleCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">VisaCheckoutSaleRequest</argument>
+            <argument name="handler" xsi:type="object">Moneris\VisaCheckout\Gateway\Response\SaleResponseHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Moneris\VisaCheckout\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">Moneris\VisaCheckout\Gateway\Validator\ResponseCodeValidator</argument>
+            <argument name="client" xsi:type="object">Moneris\VisaCheckout\Gateway\Http\Client\Client</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Sale Request -->
+    <virtualType name="VisaCheckoutSaleRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="authorize" xsi:type="string">Moneris\VisaCheckout\Gateway\Request\AuthorizationRequest</item>
+                <item name="settlement" xsi:type="string">Moneris\VisaCheckout\Gateway\Request\SettlementRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Moneris\VisaCheckout\Gateway\Request\SaleRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">Moneris\VisaCheckout\Gateway\Config\Config</argument>
+        </arguments>
+    </type>
+
+    <!-- Void command -->
+    <virtualType name="VisaCheckoutPaymentGatewayVoidCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Moneris\VisaCheckout\Gateway\Request\VoidRequest</argument>
+            <argument name="handler" xsi:type="object">Moneris\VisaCheckout\Gateway\Response\VoidResponseHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Moneris\VisaCheckout\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">Moneris\VisaCheckout\Gateway\Validator\ResponseCodeValidator</argument>
+            <argument name="client" xsi:type="object">Moneris\VisaCheckout\Gateway\Http\Client\Client</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Void Request -->
+    <type name="Moneris\VisaCheckout\Gateway\Request\VoidRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">Moneris\VisaCheckout\Gateway\Config\Config</argument>
+        </arguments>
+    </type>
+
+    <!-- Refund command -->
+    <virtualType name="VisaCheckoutPaymentGatewayRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Moneris\VisaCheckout\Gateway\Request\RefundRequest</argument>
+            <argument name="handler" xsi:type="object">Moneris\VisaCheckout\Gateway\Response\RefundResponseHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Moneris\VisaCheckout\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">Moneris\VisaCheckout\Gateway\Validator\ResponseCodeValidator</argument>
+            <argument name="client" xsi:type="object">Moneris\VisaCheckout\Gateway\Http\Client\Client</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Refund Request -->
+    <type name="Moneris\VisaCheckout\Gateway\Request\RefundRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">Moneris\VisaCheckout\Gateway\Config\Config</argument>
+        </arguments>
+    </type>
+
+    <!-- Response handlers -->
+    <virtualType name="VisaCheckoutPaymentGatewayResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="authorizeresponse" xsi:type="string">Moneris\VisaCheckout\Gateway\Response\AuthorizeResponseHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Value handlers infrastructure -->
+    <virtualType name="VisaCheckoutPaymentGatewayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">VisaCheckoutPaymentGatewayConfigValueHandler</item>
+                <item name="can_void" xsi:type="string">Moneris\VisaCheckout\Gateway\Config\CanVoidHandler</item>
+                <item name="can_cancel" xsi:type="string">Moneris\VisaCheckout\Gateway\Config\CanVoidHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="VisaCheckoutPaymentGatewayConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">Moneris\VisaCheckout\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+</config>

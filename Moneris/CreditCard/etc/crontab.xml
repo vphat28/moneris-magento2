@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="moneris">
+        <job name="moneris_proceed_recurring_payments" instance="Moneris\CreditCard\Cron\ProceedRecurringPayment" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job name="moneris_proceed_recurring_payment_queue" instance="Moneris\CreditCard\Cron\ProceedRecurringPayment" method="proceedQueue">
+            <schedule>* * * * *</schedule>
+        </job>
+    </group>
+</config>

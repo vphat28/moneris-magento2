@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Collins Harper. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="customer_account_navigation">
+            <block class="Moneris\CreditCard\Block\Customer\Link" name="customer-account-navigation-moneriscc-creditcards" after="-">
+                <arguments>
+                    <argument name="path" xsi:type="string">moneriscc/mycards</argument>
+                    <argument name="label" xsi:type="string" translate="true">My Credit Cards (Moneris)</argument>
+                </arguments>
+            </block>
+            <referenceBlock name="customer-account-navigation-my-credit-cards-link" remove="true"/>
+        </referenceBlock>
+    </body>
+</page>

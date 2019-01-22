@@ -1,0 +1,62 @@
+<?php
+/** @var \Moneris\CreditCard\Block\Adminhtml\RecurringEdit $block */
+$request = $block->getRequest();
+$recurringProfile = $block->getRecurringProfile();
+$order = $block->getOrder();
+?>
+<div class="page-main-actions">
+    <div class="page-actions">
+        <div class="page-actions-inner">
+            <div class="page-actions-buttons">
+                <button class="action back">
+                    <span><a href="<?php echo $block->getUrl('moneris/recurringpayment/index'); ?>"><?php echo $block->escapeHtml(__('Back')); ?></a></span>
+                </button>
+                <button class="action action-secondary" id="chmon-cancel-recurring-profile" title="<?php echo $block->escapeHtml(__('Cancel this recurring payment')); ?>">
+                    <span><?php echo $block->escapeHtml(__('Cancel')); ?></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table width="300px">
+    <tr>
+        <td><b><?php echo $block->escapeHtml(__('ID')); ?></b></td>
+        <td><?php echo $recurringProfile->getData('entity_id'); ?></td>
+    </tr>
+    <tr>
+        <td><b><?php echo $block->escapeHtml(__('Original Order')); ?></b></td>
+        <td><a href="<?php echo $block->escapeHtml($block->getUrl('sales/order/view', ['order_id' => $order->getId()])); ?>"><?php echo $order->getIncrementId(); ?></a></td>
+    </tr>
+    <tr>
+        <td><b><?php echo $block->escapeHtml(__('Last Payment Date')); ?></b></td>
+        <td><?php echo $recurringProfile->getData('last_payment_date'); ?></td>
+    </tr>
+    <tr>
+        <td><b><?php echo $block->escapeHtml(__('Next Payment Date')); ?></b></td>
+        <td><?php echo $recurringProfile->getData('next_payment_date'); ?></td>
+    </tr>
+</table>
+
+<script>
+    require([
+        'jquery',
+        'mage/url'
+    ], function ($, url) {
+        var ele = $('<div>Are you sure?</div>');
+        jQuery(document).ready(function () {
+            $('#chmon-cancel-recurring-profile').click(function () {
+                ele.confirm({
+                    title: 'Confirmation title',
+                    actions: {
+                        confirm: function () {
+                            window.location.href = "<?php echo $block->escapeQuote($block->getUrl('moneris/recurringpayment/delete', ['id' => '2'])); ?>";
+                        },
+                        cancel: function () {
+                        }
+                    }
+                });
+            });
+        });
+    });
+</script>

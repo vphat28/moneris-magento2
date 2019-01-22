@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Configuration reader -->
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="chmasterpass_config_provider" xsi:type="object">Moneris\Masterpass\Model\Ui\ConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Payment\Model\CcGenericConfigProvider">
+        <arguments>
+            <argument name="methodCodes" xsi:type="array">
+                <item name="chmasterpass" xsi:type="const">Moneris\Masterpass\Model\Ui\ConfigProvider::MCODE</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

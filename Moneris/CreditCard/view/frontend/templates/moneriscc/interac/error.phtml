@@ -1,0 +1,39 @@
+<?php
+$errors = $this->getResponseError();
+$issName = $issConf = '';
+if (isset($errors['ISSNAME']) && $errors['ISSNAME']) {
+    $issName = $errors['ISSNAME'];
+}
+if (isset($errors['IDEBIT_ISSNAME']) && $errors['IDEBIT_ISSNAME']) {
+    $issName = $errors['IDEBIT_ISSNAME'];
+}
+
+$issName = utf8_encode($issName);
+
+if (isset($errors['ISSCONF']) && $errors['ISSCONF']) {
+    $issConf = $errors['ISSCONF'];
+}
+if (isset($errors['IDEBIT_ISSCONF']) && $errors['IDEBIT_ISSCONF']) {
+    $issConf = $errors['IDEBIT_ISSCONF'];
+}
+
+$issConf = utf8_encode($issConf);
+
+$errMessage = __('Payment could not be processed at this time. Please try again later.');
+if (!isset($errors['IDEBIT_ISSCONF'])) {
+   $errMessage  = __('Payment payment has been declined by the card owner.');
+}
+
+if (isset($errors['response_text'])){
+    $errors = $errors['response_text'];
+}
+
+?>
+<div>
+    <?php if ($errMessage): ?><div class="message message-error error"><div><?php echo $errMessage; ?></div></div><?php endif; ?>
+
+    <br />
+    <div><?php echo __('Click "Back to Cart" to retry checkout with an alternate payment method.') ?></div>
+    <button class="action subscribe primary" onclick="javascript:location.href='<?php echo $this->getCheckoutCartUrl() ?>'"><?php echo __('Back to Cart') ?></button
+>
+</div>

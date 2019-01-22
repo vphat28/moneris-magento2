@@ -1,0 +1,210 @@
+<?php
+/**
+ * Copyright © 2016 Collins Harper. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+
+/**
+ * @var \Magento\Authorizenet\Block\Transparent\Iframe $block
+* @see \Magento\Authorizenet\Block\Transparent\Iframe
+*/
+$code = $block->escapeHtml($block->getMethodCode());
+$method = $block->getMethod();
+$controller = $block->escapeHtml($block->getRequest()->getControllerName());
+$orderUrl = $block->escapeUrl($this->helper('Magento\Authorizenet\Helper\Backend\Data')->getPlaceOrderAdminUrl());
+$ccType = $block->getInfoData('cc_type');
+$ccExpMonth = $block->getInfoData('cc_exp_month');
+$ccExpYear = $block->getInfoData('cc_exp_year');
+$_tokens = $block->getActiveTokensList();
+?>
+<!-- IFRAME for request to our server -->
+<iframe id="order-directpost-iframe" allowtransparency="true" frameborder="0" name="iframeSubmitOrder"
+        style="display:none;width:100%;background-color:transparent"
+        src="<?php echo $block->escapeUrl($block->getViewFileUrl('blank.html')); ?>">
+</iframe>
+<!-- IFRAME for request to Authorize.net -->
+<iframe id="directpost-iframe" allowtransparency="true" frameborder="0"  name="iframeDirectPost"
+        style="display:none;width:100%;background-color:transparent"
+        src="<?php echo $block->escapeUrl($block->getViewFileUrl('blank.html')); ?>">
+</iframe>
+<fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */ echo $code; ?>"
+          style="display:none;">
+    <?php if ($_tokens != ''):?>
+        <div class="admin__field">
+            <label for="<?php /* @noEscape */ echo $code; ?>_card_id" class="admin__field-label">
+                <span><?php echo $block->escapeHtml(__('Select Card')); ?></span>
+            </label>
+            <div class="admin__field-control">
+                <select id="<?php /* @noEscape */ echo $code; ?>_card_id" name="payment[vault_id]"
+                        class="admin__control-select">
+                    <option value="0"><?php echo __('Add new card')?></option>
+                    <?php foreach ($_tokens as $_id => $_token): ?>
+                        <option value="<?php echo $_id; ?>">
+                            <?php echo $_token->getCcLast() ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+    <?php endif;?>
+        <div class="admin__field _required">
+            <label for="<?php /* @noEscape */ echo $code; ?>_cc_type" class="admin__field-label">
+            <span><?php echo $block->escapeHtml(__('Credit Card Type')); ?></span>
+        </label>
+        <div class="admin__field-control">
+            <select id="<?php /* @noEscape */ echo $code; ?>_cc_type" name="payment[cc_type]"
+                    class="required-entry validate-cc-type-select admin__control-select">
+                <option value=""></option>
+                <?php foreach ($block->getCcAvailableTypes() as $typeCode => $typeName): ?>
+                    <option value="<?php echo $block->escapeHtml($typeCode); ?>"
+                            <?php if ($typeCode == $ccType): ?>selected="selected"<?php endif; ?>>
+                        <?php echo $block->escapeHtml($typeName); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+    <div class="admin__field _required">
+        <label for="<?php /* @noEscape */ echo $code; ?>_cc_number" class="admin__field-label">
+            <span><?php echo $block->escapeHtml(__('Credit Card Number')); ?></span>
+        </label>
+
+        <div class="admin__field-control">
+            <input type="text" id="<?php /* @noEscape */ echo $code; ?>_cc_number"
+                   name="payment[cc_number]"
+                   class="input-text required-entry validate-cc-number admin__control-text"
+                   value="<?php /* @noEscape */ echo $block->getInfoData('cc_number'); ?>"/>
+        </div>
+    </div>
+    <div class="admin__field _required">
+        <label for="<?php /* @noEscape */ echo $code; ?>_expiration" class="admin__field-label">
+            <span><?php echo $block->escapeHtml(__('Expiration Date')); ?></span>
+        </label>
+
+        <div class="admin__field-control">
+            <select id="<?php /* @noEscape */ echo $code; ?>_expiration"
+                    name="payment[cc_exp_month]"
+                    class="validate-cc-exp required-entry admin__control-select admin__control-select-month">
+                <?php foreach ($block->getCcMonths() as $k => $v): ?>
+                    <option value="<?php echo $block->escapeHtml($k); ?>"
+                            <?php if ($k == $ccExpMonth): ?>selected="selected"<?php endif; ?>>
+                        <?php echo $block->escapeHtml($v); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <select id="<?php /* @noEscape */ echo $code; ?>_expiration_yr"
+                    name="payment[cc_exp_year]"
+                    class="required-entry admin__control-select admin__control-select-year">
+                <?php foreach ($block->getCcYears() as $k => $v): ?>
+                    <option value="<?php /* @noEscape */ echo $k ? $block->escapeHtml($k) : ''; ?>"
+                            <?php if ($k == $ccExpYear): ?>selected="selected"<?php endif; ?>>
+                        <?php echo $block->escapeHtml($v); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+    <?php if ($block->hasVerification()): ?>
+    <div class="admin__field _required">
+        <label for="<?php /* @noEscape */ echo $code; ?>_cc_cid">
+            <span><?php echo $block->escapeHtml(__('Card Verification Number')); ?></span>
+        </label>
+
+        <div class="admin__field-control">
+            <input type="text"
+                   class="required-entry input-text validate-cc-cvn admin__control-text"
+                   id="<?php /* @noEscape */ echo $code; ?>_cc_cid" name="payment[cc_cid]"
+                   value="<?php /* @noEscape */ echo $block->getInfoData('cc_cid') ?>"/>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <div class="admin__field _required">
+        <div class="admin__field-control">
+            <input type="checkbox"
+                   id="<?php /* @noEscape */ echo $code; ?>_vault"
+                   value="1"
+                   name="payment[save]"
+                   checked="checked"
+                   class="admin__control-checkbox"/>
+            <label class="label" for="<?php /* @noEscape */ echo $code; ?>_vault">
+                <span> <?php echo $block->escapeHtml(' Use this card for future purchases.'); ?></span>
+            </label>
+        </div>
+    </div>
+    
+</fieldset>
+<script>
+    require([
+        'prototype',
+        'Magento_Sales/order/create/scripts',
+        "Magento_Sales/order/create/form",
+        'Magento_Authorizenet/js/direct-post'
+    ], function(){
+
+        /**
+         * Disable card server validation in admin
+         */
+        order.addExcludedPaymentMethod('<?php /* @noEscape */ echo $code; ?>');
+
+        <?php if (!$block->isAjaxRequest()): ?>
+            document.observe('dom:loaded', function(){
+        <?php endif; ?>
+
+        directPostModel = new directPost(
+            '<?php /* @noEscape */ echo $code; ?>',
+            'directpost-iframe',
+            '<?php /* @noEscape */ echo $controller; ?>',
+            '<?php /* @noEscape */ echo $orderUrl; ?>',
+            '<?php echo $block->escapeUrl($method->getCgiUrl()); ?>',
+            '<?php echo $block->escapeUrl($block->getUrl('*/*/save', [
+                '_secure' => $block->getRequest()->isSecure()
+            ]));?>');
+
+        <?php if (!$block->isAjaxRequest()): ?>
+            });
+        <?php endif; ?>
+        
+        $('chmoneriscc_card_id').observe('change', function(event) {
+            if ($('chmoneriscc_card_id').value == 0) {
+                $('payment_form_chmoneriscc').select('[class="admin__field _required"]').each(function(element, index){
+                    $(element).show();
+                });
+                $('chmoneriscc_cc_type').addClassName('required-entry');
+                   $('chmoneriscc_cc_type').addClassName('validate-cc-type-select');          
+                   
+                $('chmoneriscc_cc_number').addClassName('required-entry');
+                $('chmoneriscc_cc_number').addClassName('validate-cc-number');
+                
+                $('chmoneriscc_expiration').addClassName('validate-cc-exp');
+                $('chmoneriscc_expiration').addClassName('required-entry');
+                    
+                $('chmoneriscc_expiration_yr').addClassName('required-entry');
+                
+                if($('chmoneriscc_cc_cid') != undefined) {
+                    $('chmoneriscc_cc_cid').addClassName('required-entry');
+                    $('chmoneriscc_cc_cid').addClassName('validate-cc-cvn');
+                }
+            } else {
+                $('payment_form_chmoneriscc').select('[class="admin__field _required"]').each(function(element, index){
+                    $(element).hide();
+                });
+                $('chmoneriscc_cc_type').removeClassName('required-entry');
+                $('chmoneriscc_cc_type').removeClassName('validate-cc-type-select');
+                     
+                $('chmoneriscc_cc_number').removeClassName('required-entry');
+                $('chmoneriscc_cc_number').removeClassName('validate-cc-number');
+                
+                $('chmoneriscc_expiration').removeClassName('validate-cc-exp');
+                $('chmoneriscc_expiration').removeClassName('required-entry');
+                    
+                $('chmoneriscc_expiration_yr').removeClassName('required-entry');
+
+                if($('chmoneriscc_cc_cid') != undefined) {
+                    $('chmoneriscc_cc_cid').removeClassName('required-entry');
+                    $('chmoneriscc_cc_cid').removeClassName('validate-cc-cvn');
+                }
+            }
+         });
+    });
+</script>
