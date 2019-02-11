@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magento2 French Language Pack (fr_CA)
+ * 
+ */
+-->
+<language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/Language/package.xsd">
+    <code>fr_CA</code>
+    <vendor>moneris</vendor>
+    <package>fr_ca</package>
+    <sort_order>1</sort_order>
+</language>
