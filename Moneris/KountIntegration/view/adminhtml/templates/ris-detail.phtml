@@ -1,0 +1,11 @@
+<?php
+/** @var \Moneris\KountIntegration\Block\Adminhtml\KountRiskDetail $block */
+$payment = $block->getPayment();
+$additionalInfo = $payment->getAdditionalInformation();
+
+if (isset($additionalInfo['kount_score'])) {
+    ?>
+    <p><b><?php echo $block->escapeHtml(__('Kount Score')) ?>: <?php echo $additionalInfo['kount_score']; ?></b></p>
+<?php
+}
+?>

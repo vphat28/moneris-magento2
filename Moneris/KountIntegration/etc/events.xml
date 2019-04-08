@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="controller_action_predispatch">
+        <observer name="controller_action_predispatch_setSessionId" instance="Moneris\KountIntegration\Observer\SetSessionId"/>
+    </event>
+
+    <event name="checkout_submit_all_after">
+        <observer name="monerikountintegration_sales_order_place_after" instance="Moneris\KountIntegration\Observer\SalesOrderPlaceAfter" />
+    </event>
+</config>

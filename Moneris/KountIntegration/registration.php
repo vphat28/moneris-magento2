@@ -5,3 +5,5 @@
     'Moneris_KountIntegration',
     __DIR__
 );
+
+require_once __DIR__ . '/kountClasses.php';
