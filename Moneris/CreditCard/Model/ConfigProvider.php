@@ -97,7 +97,7 @@ class ConfigProvider extends CcGenericConfigProvider
         $config['payment'][$this->code]['active'] = true;
         $config['payment'][$this->code]['isActive'] = true;
         $config['payment'][$this->code]['ccVaultCode'] = self::CC_VAULT_CODE;
-        $config['payment'][$this->code]['isRecurring'] = $this->dataHelper->getConfigData('payment/chmoneriscc/is_recurring');
+        $config['payment'][$this->code]['isRecurring'] = (bool)$this->dataHelper->getConfigData('payment/chmoneriscc/is_recurring');
         $config['payment'][$this->code]['supportedRecurringTerms'] = $this->getSupportedRecurringTerms();
         $config['payment'][$this->code]['storedCards'] = $this->getStoredCards();
         $config['payment'][$this->code]['canSaveCard'] = $this->canSaveCard();
