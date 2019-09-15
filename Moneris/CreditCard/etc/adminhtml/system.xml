@@ -105,10 +105,12 @@
 
                     <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Store ID</label>
+                        <config_path>payment/chmoneriscc/login</config_path>
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     </field>
                     <field id="password" translate="label" type="obscure" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>API Token</label>
+                        <config_path>payment/chmoneriscc/password</config_path>
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     </field>
 
@@ -119,13 +121,15 @@
                         <label>Maximum Order Total</label>
                     </field>
 
-                    <field id="test" translate="label" type="select" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="test" translate="label" type="select" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Test Mode</label>
+                        <config_path>payment/chmoneriscc/test</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
 
                     <field id="debug" translate="label_tooltip" type="select" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Debug Mode</label>
+                        <config_path>payment/chmoneriscc/debug</config_path>
                         <tooltip>Will log detailed information, this feature is not PCI compliant.</tooltip>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>

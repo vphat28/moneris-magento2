@@ -96,7 +96,7 @@ abstract class AbstractHelper extends \Magento\Framework\App\Helper\AbstractHelp
 
     public function isTest()
     {
-        return $this->getModuleConfig(self::XML_PATH_TEST);
+        return (bool)$this->getModuleConfig(self::XML_PATH_TEST);
     }
 
     public function isDebug()
@@ -109,11 +109,15 @@ abstract class AbstractHelper extends \Magento\Framework\App\Helper\AbstractHelp
         return self::CONFIG_PATH . self::MODULE_CODE . '/';
     }
 
-    public function getModuleConfig($path)
+    public function getModuleConfig($path, $bool = false)
     {
         $path = $this->getConfigPath() . $path;
 
-        $value = $this->getConfigValue($path);
+        if ($bool) {
+            $value = $this->getConfigValue($path);
+        } else {
+            $value = $this->getConfigValue($path);
+        }
 
         if ($this->isAdmin()) {
             $_creditMemo = $this->registry->registry('current_creditmemo');

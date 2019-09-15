@@ -5,6 +5,7 @@
  */
 namespace Moneris\CreditCard\Helper;
 
+use Magento\Store\Model\ScopeInterface;
 use Moneris\CreditCard\Model\ObjectFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\Context;
@@ -231,7 +232,9 @@ class Data extends AbstractHelper
 
     public function isCCTestMode()
     {
-        return (bool)$this->getConfigData('payment/chmoneriscc/test');
+        $v = (bool)$this->scopeConfig->isSetFlag('payment/chmoneriscc/test', ScopeInterface::SCOPE_STORE);
+
+        return $v;
     }
 
     public function getObject($class)
