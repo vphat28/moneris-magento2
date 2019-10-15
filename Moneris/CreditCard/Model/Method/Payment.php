@@ -757,6 +757,19 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             $data->setData(array_merge($data->getData(), $additionalData));
         }
 
+        if (class_exists('Moneris\KountIntegration\DataProvider\KountDataProvider')) {
+            /** @var \Moneris\KountIntegration\DataProvider\KountDataProvider $kountDataProvider */
+            $kountDataProvider = ObjectManager::getInstance()->get('\Moneris\KountIntegration\DataProvider\KountDataProvider');
+            
+            // Assign Data to Kount Integration
+            if (!empty($additionalData)) {
+                foreach (['cc_number', 'cc_cid', 'cc_exp_year', 'cc_exp_month', 'cc_type'] as $d) {
+                    if (isset($additionalData[$d])) {
+                        $kountDataProvider->setAdditionalData($d, $additionalData[$d]);
+                    }
+                }
+            }
+        }
 
         $info = $this->getInfoInstance();
 
