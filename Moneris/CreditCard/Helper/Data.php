@@ -211,6 +211,23 @@ class Data extends AbstractHelper
             sprintf('%02d', $month);
     }
 
+    public function getCardTitle($cardType)
+    {
+        switch ($cardType) {
+            case 'AX':
+                return 'Amex';
+            break;
+            case 'V':
+                return 'Visa';
+            break;
+            case 'M':
+                return 'MasterCard';
+            break;
+        }
+
+        return $cardType;
+    }
+
     /**
      * @param string $term
      * @return float|int

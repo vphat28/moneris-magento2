@@ -277,6 +277,26 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         $this->responseFactory = $responseFactory;
     }
 
+    /**
+     * Retrieve payment method title
+     * @return string
+     */
+    public function getTitle()
+    {
+        $order = $this->_registry->registry('current_order');
+
+        if ($order->getId()) {
+            $additionInfo = $order->getPayment()->getAdditionalInformation();
+
+            if (isset($additionInfo['card_type'])) {
+                $title = __('Credit Card') . ' - ' . $this->chHelper->getCardTitle($additionInfo['card_type']);
+                return $title;
+            }
+        }
+
+        return $this->getConfigData('title');
+    }
+
     /// LEGACY
     protected function log($x, $lineNumber = null)
     {
@@ -989,6 +1009,10 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             $this->getHelper()->handleError(__('Error in processing payment: '. $result->getMessage()), true);
         } else {
             $this->log(__METHOD__ . " success ! ");
+        }
+
+        if (isset($result->getData('raw_data')['CardType'])) {
+            $this->payment->setAdditionalInformation('card_type', $result->getData('raw_data')['CardType']);
         }
 
         //Save moneris last_trans_id into order payment for capture purpose.

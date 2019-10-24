@@ -20,4 +20,8 @@
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session</argument>
         </arguments>
     </type>
+    <type name="Magento\Sales\Model\ResourceModel\Order\Grid\Collection">
+        <plugin name="alter_paymentmethod_code" type="Moneris\CreditCard\Plugin\Adminhtml\OrderGridCollection" />
+    </type>
+
 </config>
