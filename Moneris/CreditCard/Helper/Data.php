@@ -223,6 +223,15 @@ class Data extends AbstractHelper
             case 'M':
                 return 'MasterCard';
             break;
+            case 'C1':
+                return 'JCB';
+            break;
+            case 'UP':
+                return 'UnionPay';
+            break;
+            case 'NO':
+                return 'Disover';
+            break;
         }
 
         return $cardType;
