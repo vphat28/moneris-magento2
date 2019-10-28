@@ -119,7 +119,7 @@
                         <label>Maximum Order Total</label>
                     </field>
 
-                    <field id="test" translate="label" type="select" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="testmode" translate="label" type="select" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Test Mode</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
