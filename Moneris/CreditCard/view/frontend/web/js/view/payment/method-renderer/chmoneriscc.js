@@ -8,19 +8,14 @@ define(
         'ko',
         'jquery',
         'Magento_Payment/js/view/payment/cc-form',
-        'Magento_Checkout/js/action/place-order',
-        'Magento_Payment/js/model/credit-card-validation/validator',
-        'Magento_Checkout/js/model/payment/additional-validators',
-        'Magento_Ui/js/modal/alert',
-        'Magento_Checkout/js/action/redirect-on-success',
         'mage/url',
         'Magento_Customer/js/model/customer',
         'underscore'
     ],
-    function (ko,$,Component,placeOrderAction,validator,additionalValidators,alert,redirectOnSuccessAction,url, customer, _) {
+    function (ko,$,Component,url, customer, _) {
         'use strict';
         var config=window.checkoutConfig.payment.chmoneriscc;
-        console.log(config);
+
         return Component.extend({
             isActive:function () {
                 return true;
@@ -127,46 +122,6 @@ define(
             },
             hasVerification: function () {
                 return window.checkoutConfig.payment.ccform.hasVerification[this.getCode()];
-            },
-
-            /**
-             * @override
-             */
-            placeOrder: function (data, event) {
-                var self = this;
-
-                if (event) {
-                    event.preventDefault();
-                }
-
-                if (this.validate() && additionalValidators.validate()) {
-                    this.isPlaceOrderActionAllowed(false);
-
-                    this.getPlaceOrderDeferredObject()
-                        .fail(
-                            function () {
-                                self.isPlaceOrderActionAllowed(true);
-                            }
-                        ).done(
-                            function () {
-                                if (self.redirectAfterPlaceOrder) {
-                                    redirectOnSuccessAction.execute();
-                                }else {
-                                    self.afterPlaceOrder();
-                                }
-                            }
-                        );
-
-                    return true;
-                }
-
-                return false;
-            },
-            /**
-             * After place order callback
-             */
-            afterPlaceOrder: function () {
-                window.location.replace(url.build('moneriscc/index/redirect'));
             },
             /**
              * @override
