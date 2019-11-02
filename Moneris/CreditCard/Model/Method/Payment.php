@@ -283,17 +283,6 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      */
     public function getTitle()
     {
-        $order = $this->_registry->registry('current_order');
-
-        if ($order->getId()) {
-            $additionInfo = $order->getPayment()->getAdditionalInformation();
-
-            if (isset($additionInfo['card_type'])) {
-                $title = __('Credit Card') . ' - ' . $this->chHelper->getCardTitle($additionInfo['card_type']);
-                return $title;
-            }
-        }
-
         return $this->getConfigData('title');
     }
 

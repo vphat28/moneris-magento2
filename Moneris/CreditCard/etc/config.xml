@@ -8,19 +8,6 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <payment>
-            <chmoneriscc_m>
-                <title>Credit Card - MasterCard</title>
-            </chmoneriscc_m>
-            <chmoneriscc_ax>
-                <title>Credit Card - Amex</title>
-            </chmoneriscc_ax>
-            <chmoneriscc_v>
-                <title>Credit Card - Visa</title>
-            </chmoneriscc_v>
-            <chmoneris>
-                <model>Moneris\CreditCard\Model\Method\Payment</model>
-                <enable_vault>0</enable_vault>
-            </chmoneris>
             <chmoneriscc>
                 <model>Moneris\CreditCard\Model\Method\Payment</model>
                 <active>0</active>
