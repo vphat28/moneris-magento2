@@ -5,6 +5,7 @@
  */
 namespace Moneris\CreditCard\Model\Method;
 
+use Magento\Framework\Exception\LocalizedException;
 use Moneris\CreditCard\Helper\Data as chHelper;
 use Moneris\CreditCard\Model\Transaction;
 use Moneris\CreditCard\Model\AbstractModel as MonerisConstants;
@@ -822,24 +823,28 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      */
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-        $this->psrLogger->info("auth only");
-        $this->payment = $payment;
-        $this->amount = $amount;
-        $this->psrLogger->info("order id = ".$this->payment->getOrder()->getStatus());
+        try {
+            $this->psrLogger->info("auth only");
+            $this->payment = $payment;
+            $this->amount = $amount;
+            $this->psrLogger->info("order id = " . $this->payment->getOrder()->getStatus());
 
-        /** @var Registry $register */
-        $register = ObjectManager::getInstance()->get(Registry::class);
-        $byPass = $register->registry('by_pass_authorize_payment');
+            /** @var Registry $register */
+            $register = ObjectManager::getInstance()->get(Registry::class);
+            $byPass = $register->registry('by_pass_authorize_payment');
 
-        if ($byPass) {
-            $this->recurringOccurence = true;
-            $this->payment->setLastTransId($this->payment->getAdditionalInformation('moneris_receipt_id'));
-            $this->payment->setAdditionalInformation('receipt_id', $this->payment->getAdditionalInformation('moneris_receipt_id'));
-            $this->payment->setTransactionId($this->payment->getAdditionalInformation('moneris_trans_id'));
-            return $this;
+            if ($byPass) {
+                $this->recurringOccurence = true;
+                $this->payment->setLastTransId($this->payment->getAdditionalInformation('moneris_receipt_id'));
+                $this->payment->setAdditionalInformation('receipt_id', $this->payment->getAdditionalInformation('moneris_receipt_id'));
+                $this->payment->setTransactionId($this->payment->getAdditionalInformation('moneris_trans_id'));
+                return $this;
+            }
+
+            return $this->processTransaction(self::AUTHORIZE);
+        } catch (\Exception $exception) {
+            throw new LocalizedException(__('We cannot process your payment. Please try using another card or call your bank.'));
         }
-
-        return $this->processTransaction(self::AUTHORIZE);
     }
 
 
@@ -853,24 +858,28 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      */
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-        $this->psrLogger->info("capture");
-        $this->payment = $payment;
-        $this->amount = $amount;
+        try {
+            $this->psrLogger->info("capture");
+            $this->payment = $payment;
+            $this->amount = $amount;
 
-        /** @var Registry $register */
-        $register = ObjectManager::getInstance()->get(Registry::class);
-        $byPass = $register->registry('by_pass_authorize_payment');
+            /** @var Registry $register */
+            $register = ObjectManager::getInstance()->get(Registry::class);
+            $byPass = $register->registry('by_pass_authorize_payment');
 
-        if ($byPass) {
-            $this->recurringOccurence = true;
-            $this->payment->setLastTransId($this->payment->getAdditionalInformation('moneris_receipt_id'));
-            $this->payment->setAdditionalInformation('receipt_id', $this->payment->getAdditionalInformation('moneris_receipt_id'));
-            $this->payment->setCcTransId($this->payment->getAdditionalInformation('moneris_trans_id'));
-            $this->payment->setTransactionId($this->payment->getAdditionalInformation('moneris_trans_id'));
-            return $this;
+            if ($byPass) {
+                $this->recurringOccurence = true;
+                $this->payment->setLastTransId($this->payment->getAdditionalInformation('moneris_receipt_id'));
+                $this->payment->setAdditionalInformation('receipt_id', $this->payment->getAdditionalInformation('moneris_receipt_id'));
+                $this->payment->setCcTransId($this->payment->getAdditionalInformation('moneris_trans_id'));
+                $this->payment->setTransactionId($this->payment->getAdditionalInformation('moneris_trans_id'));
+                return $this;
+            }
+
+            return $this->processTransaction(self::CAPTURE);
+        } catch (\Exception $exception) {
+            throw new LocalizedException(__('We cannot process your payment. Please try using another card or call your bank.'));
         }
-
-        return $this->processTransaction(self::CAPTURE);
     }
 
     public function processTransaction($paymentType = self::AUTHORIZE)
