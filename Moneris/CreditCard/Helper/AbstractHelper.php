@@ -14,7 +14,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
  */
 abstract class AbstractHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const XML_PATH_TEST = 'test';
+    const XML_PATH_TEST = 'testmode';
     const XML_PATH_DEBUG = 'debug';
     const CODE_PATH = 'app/code/CollinsHarper/';
 

@@ -257,7 +257,7 @@ class Data extends AbstractHelper
 
     public function isCCTestMode()
     {
-        return (bool)$this->getConfigData('payment/chmoneriscc/test');
+        return (bool)$this->getConfigData('payment/chmoneriscc/testmode');
     }
 
     public function getObject($class)
