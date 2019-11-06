@@ -287,7 +287,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         $order = $this->_registry->registry('current_order');
         $info = $this->getData('info_instance');
 
-        if ($info->getAdditionalInformation()) {
+        if (!empty($info) && $info->getAdditionalInformation()) {
             $additionInfo = $info->getAdditionalInformation();
 
             if (isset($additionInfo['card_type'])) {
