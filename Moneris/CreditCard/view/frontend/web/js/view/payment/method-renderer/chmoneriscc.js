@@ -10,9 +10,10 @@ define(
         'Magento_Payment/js/view/payment/cc-form',
         'mage/url',
         'Magento_Customer/js/model/customer',
-        'underscore'
+        'underscore',
+        'Magento_Payment/js/model/credit-card-validation/validator'
     ],
-    function (ko,$,Component,url, customer, _) {
+    function (ko,$,Component,url, customer, _, cCValidator) {
         'use strict';
         var config=window.checkoutConfig.payment.chmoneriscc;
 
