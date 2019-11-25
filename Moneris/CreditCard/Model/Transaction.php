@@ -669,7 +669,7 @@ class Transaction extends AbstractModel
     protected function _checkCvd(\Magento\Framework\DataObject $result)
     {
         // IF we are requiring liability shift we do not need CVV/AVS validation
-        if (!$this->getHelper()->getModuleConfig('useccv') || $this->getHelper()->getModuleConfig('require_vbv')) {
+        if (!$this->getHelper()->getConfigData('payment/moneris/chmoneriscc/useccv') || $this->getHelper()->getConfigData('require_vbv')) {
             return true;
         }
 
@@ -808,14 +808,14 @@ class Transaction extends AbstractModel
      */
     public function buildMpgCvdInfo(\Magento\Framework\DataObject $payment)
     {
-        if (!$this->getHelper()->getModuleConfig('useccv')) {
+        if (!$this->getHelper()->getConfigData('payment/moneris/chmoneriscc/useccv')) {
             return null;
         }
-
         $cvv = [
             'cvd_indicator' => '1',
             'cvd_value'     => $payment->getCcCid()
         ];
+        $this->helper->log('CVD sent');
         
         $mpgCvdInfo = new \mpgCvdInfo($cvv);
         
