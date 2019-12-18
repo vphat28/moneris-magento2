@@ -940,6 +940,8 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             $this->getHelper()->getCheckoutSession()->setMonerisCavvCvdResult(false);
 
             $this->getHelper()->handleError(__('Only VBV / 3DS enrolled cards are accepted. Please try another card or a different payment method.'));
+
+            $this->logger->debug('Only VBV / 3DS enrolled cards are accepted. Please try another card or a different payment method.');
             $this->payment->setIsTransactionPending(true);
             return $this;
         }
@@ -1174,6 +1176,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      */
     public function setResponseData(array $postData)
     {
+        $this->logger->debug('response moneris', $postData);
         $this->getResponse()->setData($postData);
         return $this;
     }
@@ -1266,6 +1269,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         }
 
         if ($response->getXResponseCode() == self::RESPONSE_CODE_HELD) {
+            $this->logger->debug('response pending txn', $response->getData());
             $payment->setIsTransactionPending(true)
                 ->setIsFraudDetected(true);
         }
