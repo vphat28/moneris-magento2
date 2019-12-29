@@ -23,7 +23,7 @@ define(
             },
 
             isRecurringEnable: function () {
-                if (customer.isLoggedIn() && config.isRecurring) {
+                if (customer.isLoggedIn() && window.checkoutConfig.payment.chmoneriscc.isRecurring === '1') {
                     return true;
                 }
                 return false;
