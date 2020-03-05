@@ -186,7 +186,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
     private $responseFactory;
 
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var \Moneris\CreditCard\Logger\Logger
      */
     private $psrLogger;
 
@@ -273,7 +273,8 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                 $data
         );
         $this->status = $status;
-        $this->psrLogger = $context->getLogger();
+        /** @var \Moneris\CreditCard\Logger\Logger psrLogger */
+        $this->psrLogger = ObjectManager::getInstance()->get(\Moneris\CreditCard\Logger\Logger::class);
         $this->orderModel = $orderModel;
         $this->responseFactory = $responseFactory;
     }
