@@ -9,14 +9,13 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\QuoteRepository;
 use Moneris\MonerisCheckout\Helper\Data;
 use Magento\Catalog\Helper\Image;
 
-class GetTicket extends Action
+class Getticket extends Action
 {
     const PREREQUEST_ENDPOINT = 'https://gatewayt.moneris.com/chkt/request/request.php';
 
@@ -29,7 +28,7 @@ class GetTicket extends Action
     /** @var Data */
     private $data;
 
-    /** @var CheckoutSession $checkoutSession */
+    /** @var Session $checkoutSession */
     private $checkoutSession;
 
     /** @var QuoteRepository */
@@ -50,7 +49,8 @@ class GetTicket extends Action
         QuoteRepository $quoteRepository,
         ProductRepositoryInterface $productRepository,
         Image $imageHelper
-    ) {
+    )
+    {
         $this->userContext = $userContext;
         $this->clientFactory = $clientFactory;
         $this->data = $data;
@@ -92,6 +92,10 @@ class GetTicket extends Action
         return number_format((float)$number, 2, '.', '');
     }
 
+    /**
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute()
     {
         $url = self::PREREQUEST_ENDPOINT;
@@ -99,7 +103,7 @@ class GetTicket extends Action
 
         /** @var Client $client */
         $client = $this->clientFactory->create([
-            'headers' => [ 'Content-Type' => 'application/json' ]
+            'headers' => ['Content-Type' => 'application/json']
         ]);
 
         // Get quote
@@ -131,15 +135,7 @@ class GetTicket extends Action
         $requestData->cart->items = [];
         $requestData->shipping_rates = [];
         $newRate = new \stdClass();
-        /**
-         *   "code": "codeO1",
-        * "description": "Standard",
-        * "date": "3 days",
-        * "amount": "$200.00",
-         * "txn_taxes": "$16.80",
-         *"txn_total": "1202.80",
-        "default_rate": "false"
-        */
+
         $newRate->code = "code01";
         $newRate->description = "Standard";
         $newRate->date = "3 days";
@@ -164,6 +160,7 @@ class GetTicket extends Action
                     $itemDataToSend->url = $this->imageHelper->getUrl();
                 }
 
+
                 $itemDataToSend->description = $product->getName();
                 $itemDataToSend->product_code = $product->getSku();
                 $itemDataToSend->unit_cost = $this->formatPrice($item->getPrice());
@@ -181,7 +178,7 @@ class GetTicket extends Action
 
         $response = $client->post($url,
             ['body' => json_encode(
-               $requestData
+                $requestData
             )]
         );
 

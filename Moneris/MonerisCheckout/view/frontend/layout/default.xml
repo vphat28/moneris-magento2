@@ -10,7 +10,7 @@
                             <item name="children" xsi:type="array">
                                 <item name="extra_info" xsi:type="array">
                                     <item name="children" xsi:type="array">
-                                        <item name="stripinstantcheckout" xsi:type="array">
+                                        <item name="monerisinstantcheckout" xsi:type="array">
                                             <item name="component" xsi:type="string">Moneris_MonerisCheckout/js/button-in-minicart</item>
                                         </item>
                                     </item>
@@ -21,8 +21,5 @@
                 </argument>
             </arguments>
         </referenceBlock>
-        <referenceContainer name="root">
-            <block name="stripeinstantcheckout.config" class="Stripeofficial\InstantCheckout\Block\Config" template="Stripeofficial_InstantCheckout::config.phtml"/>
-        </referenceContainer>
     </body>
 </page>

@@ -124,6 +124,15 @@ define(
                         rate[2]["txn_total"] = "16.23";
                         rate[2]["default_rate"] = "true";
 
+                        rate[3] = {};
+                        rate[3]["code"] = "rateM3xavi";
+                        rate[3]["description"] = "Deliery by xavi";
+                        rate[3]["date"] = "1 week";
+                        rate[3]["amount"] = "61.00";
+                        rate[3]["txn_taxes"] = "11.51";
+                        rate[3]["txn_total"] = "161.23";
+                        rate[3]["default_rate"] = "true";
+
                         rates["data"] = rate;
 
                         var json_rate = JSON.stringify(rates)
