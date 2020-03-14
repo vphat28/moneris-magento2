@@ -17,6 +17,8 @@ define(
                 template: 'Moneris_MonerisCheckout/button-in-cart'
             },
 
+            cartId: null,
+
             initialize: function () {
                 this._super();
 
@@ -30,6 +32,8 @@ define(
             },
 
             myCheckout: {},
+            formattedAddress: {
+            },
             isInCheckoutPages: false,
 
             initMonerisCheckout: function () {
@@ -40,9 +44,6 @@ define(
                 fullScreenLoader.startLoader();
                 var urlXhr = urlBuilder.build('monerischeckout/request/getticket');
                 var self = this;
-               /* self.myCheckout.startCheckout('1549295979bOLpvtgDROtU97uS0oIzTeRdGP1Ma5');
-                return;
-*/
 
                 $.ajax({
                     showLoader: true,
@@ -54,15 +55,11 @@ define(
                     contentType: 'application/json'
                 }).done(function (returnData) {
                     // Close payment sheet with success message
-                    self.myCheckout.startCheckout(returnData);
-                    fullScreenLoader.stopLoader();
+                    self.cartId = returnData.quote_id;
+                    self.myCheckout.startCheckout(returnData.ticket);
                 }).fail(function () {
                     fullScreenLoader.stopLoader();
                 });
-            },
-
-            calculateShipping: function (address) {
-
             },
 
             configureButton: function () {
@@ -71,9 +68,6 @@ define(
                 $(document).ready(function () {
                     self.myCheckout = new monerisCheckout();
                     var res = {};
-
-                    console.log('a');
-
                     self.myCheckout.setMode("dev");
                     self.myCheckout.setCheckoutDiv("monerisCheckout");
 
@@ -89,77 +83,82 @@ define(
                     //myCheckout.startCheckout("qwerty12345");
 
                     function myAddressChange(msg) {
-                        console.log("new address is: " + msg);
-                        // got an address change send new shipping and total.
+                        console.log("new address is: ");
+                        console.log(Data.get('cart')().summary_count);
+                        var response = JSON.parse(msg);
+                        console.log(response);
+                        var urlXhr;
 
-                        var rates = {};
-                        rates["action"] = "set_shipping_rates";
-                        rates["data"] = {};
+                        if (!self.isGuest()) {
+                            urlXhr = urlBuilder.build('rest/V1/carts/' + 'mine' + '/estimate-shipping-methods');
+                        } else {
+                            urlXhr = urlBuilder.build('rest/V1/guest-carts/' + self.cartId + '/estimate-shipping-methods');
+                        }
 
-                        var rate = {};
-                        rate[0] = {};
-                        rate[0]["code"] = "rateM1";
-                        rate[0]["description"] = "Standard R";
-                        rate[0]["date"] = "4 days";
-                        rate[0]["amount"] = "Free";
-                        rate[0]["txn_taxes"] = "0.01";
-                        rate[0]["txn_total"] = "1.00";
-                        rate[0]["default_rate"] = "false";
+                        var address = response.address;
+                        var newAddress = {
+                            firstname: 'test',
+                            lastname: 'test',
+                            street: [address.address_1, address.address_2],
+                            city: address.city,
+                            countryId: address.country,
+                            postcode: address.postal_code,
+                            region: address.province,
+                            telephone: '123456789',
+                        };
 
-                        rate[1] = {};
-                        rate[1]["code"] = "rateM2";
-                        rate[1]["description"] = "Express R";
-                        rate[1]["date"] = "0.5 day";
-                        rate[1]["amount"] = "11.01";
-                        rate[1]["txn_taxes"] = "2.01";
-                        rate[1]["txn_total"] = "13.01";
-                        rate[1]["default_rate"] = "true";
+                        self.formattedAddress = newAddress;
 
-                        rate[2] = {};
-                        rate[2]["code"] = "rateM3";
-                        rate[2]["description"] = "Deliery by foot";
-                        rate[2]["date"] = "1 week";
-                        rate[2]["amount"] = "6.00";
-                        rate[2]["txn_taxes"] = "1.51";
-                        rate[2]["txn_total"] = "16.23";
-                        rate[2]["default_rate"] = "true";
+                        $.ajax({
+                            url: urlXhr,
+                            data: JSON.stringify({ 'address': self.formattedAddress }),
+                            type: 'post',
+                            dataType: 'json',
+                            contentType: 'application/json'
+                        }).done(function (result) {
+                            var rates = {};
+                            rates["action"] = "set_shipping_rates";
+                            rates["data"] = {};
 
-                        rate[3] = {};
-                        rate[3]["code"] = "rateM3xavi";
-                        rate[3]["description"] = "Deliery by xavi";
-                        rate[3]["date"] = "1 week";
-                        rate[3]["amount"] = "61.00";
-                        rate[3]["txn_taxes"] = "11.51";
-                        rate[3]["txn_total"] = "161.23";
-                        rate[3]["default_rate"] = "true";
+                            var shippingOptions = [];
 
-                        rates["data"] = rate;
+                            for (var i = 0; i < result.length; i++) {
+                                shippingOptions.push({
+                                    'code': result[i]['carrier_code'] + '|' + result[i]['method_code'],
+                                    'description': result[i]['method_title'],
+                                    'date': result[i]['carrier_title'],
+                                    'amount': result[i]['amount'],
+                                    'txn_taxes': 0,
+                                    'txn_total': parseFloat(Data.get('cart')().subtotalAmount) + result[i]['amount'],
+                                });
+                            }
 
-                        var json_rate = JSON.stringify(rates)
-                        console.log(json_rate);
-
-                        self.myCheckout.setNewShippingRates(json_rate);
+                            rates["data"] = shippingOptions;
+                            var json_rate = JSON.stringify(rates)
+                            console.log(json_rate);
+                            self.myCheckout.setNewShippingRates(json_rate);
+                        });
                     }
 
                     function myCancelTransaction(data) {
                         console.log(data);
+                        fullScreenLoader.stopLoader();
                         self.myCheckout.closeCheckout();
                     }
 
                     function myPaymentComplete(data) {
-                        console.log("got payment complete");
-                        console.log(data);
+                        fullScreenLoader.startLoader();
                         self.myCheckout.closeCheckout();
-
-                        res = JSON.parse(data);
-
-                        $('<form method="POST"><input type="hidden" name="get_response" value="true"><input type="hidden" name="ticket" value="' + res.ticket + '"></form>').appendTo('body').submit();
-
                     }
 
                     function myPaymentReceipt(data) {
-                        console.log("got payment Receipt");
-                        console.log(data);
+                        fullScreenLoader.startLoader();
+                        var json = JSON.parse(data);
+                        var urlXhr = urlBuilder.build('monerischeckout/request/getreceipt');
+
+                        $.post(urlXhr, json, function(data) {
+                            self.chargeRequest(data.data.request);
+                        }, "json");
                     }
 
                     function myErrorEvent() {
@@ -178,16 +177,152 @@ define(
                 var self = this;
 
                 if (!this.isInCheckoutPages) {
-                    $('body').append('<div id="monerisCheckout"></div>');
+                    $('body').append('<div id="monerisCheckout" style="z-index: 9999"></div>');
                     var url = "https://gatewaydev.moneris.com/chkt/js/chkt_v1.00.js";
 
                     $.getScript(url, function () {
-                        console.log('loaded');
                         self.configureButton();
                     });
                 } else {
                     self.configureButton();
                 }
+            },
+
+            chargeRequest: function (ev) {
+                var self = this;
+
+                if (self.isGuest()) {
+                    self.makeGuestShipping(ev);
+                } else {
+                    self.makeMineOrderShipping(ev);
+                }
+            },
+
+            makeMineOrderShipping: function (ev) {
+                console.log('make min order shipping');
+                var self = this;
+                var urlXhr = urlBuilder.build('rest/V1/carts/' + 'mine' + '/shipping-information');
+                var formattedAddress = self.formattedAddress;
+                var shippingAddress = formattedAddress;
+                var shippingOption = ev.ship_rates.code;
+                shippingOption = shippingOption.split('|');
+                shippingAddress.same_as_billing = 1;
+
+                $.ajax({
+                    url: urlXhr,
+                    data: JSON.stringify({
+                        addressInformation: {
+                            'shipping_address': shippingAddress,
+                            'billing_address': formattedAddress,
+                            'shipping_method_code': shippingOption[0],
+                            'shipping_carrier_code': shippingOption[1],
+                        }
+                    }),
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json'
+                }).done(function (returnData) {
+                    self.makeMineOrder(ev);
+                }).fail(function () {
+                    console.log('can not make order');
+                });
+            },
+
+            makeGuestShipping: function (ev) {
+                var self = this;
+                var cartId = self.cartId;
+                var urlXhr = urlBuilder.build('rest/V1/guest-carts/' + cartId + '/shipping-information');
+                var formattedAddress = this.formattedAddress;
+                var shippingAddress = formattedAddress;
+                shippingAddress.same_as_billing = 1;
+                var shippingOption = ev.ship_rates.code;
+                shippingOption = shippingOption.split('|');
+                shippingAddress.same_as_billing = 1;
+
+                $.ajax({
+                    url: urlXhr,
+                    data: JSON.stringify({
+                        addressInformation: {
+                            'shipping_address': shippingAddress,
+                            'billing_address': formattedAddress,
+                            'shipping_method_code': shippingOption[0],
+                            'shipping_carrier_code': shippingOption[1],
+                        }
+                    }),
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json'
+                }).done(function (returnData) {
+                    self.makeQuestOrder(ev);
+                }).fail(function () {
+                });
+            },
+
+            makeMineOrder: function (ev) {
+                var self = this;
+                var urlXhr = urlBuilder.build('rest/V1/carts/' + 'mine' + '/payment-information');
+                var paymentInformation = {
+                    'email': ev.cust_info.email,
+                    'paymentMethod': {
+                        'method': 'chmoneriscc',
+                        'additional_data': {
+                            'moneris_checkout_ticket': ev.ticket
+                        }
+                    },
+                    'billingAddress': self.formattedAddress
+                };
+
+                $.ajax({
+                    url: urlXhr,
+                    data: JSON.stringify(paymentInformation),
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json'
+                }).done(function () {
+                    Data.set('cart', {});
+                    window.location.href = urlBuilder.build('checkout/onepage/success');
+                });
+            },
+
+            makeQuestOrder: function (ev) {
+                var self = this;
+                var urlXhr = urlBuilder.build('rest/V1/guest-carts/' + self.cartId + '/payment-information');
+                var paymentInformation = {
+                    'email': ev.cust_info.email,
+                    'paymentMethod': {
+                        'method': 'chmoneriscc',
+                        'additional_data': {
+                            'moneris_checkout_ticket': ev.ticket
+                        }
+                    },
+                    'billingAddress': self.formattedAddress
+                };
+
+                $.ajax({
+                    url: urlXhr,
+                    data: JSON.stringify(paymentInformation),
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json'
+                }).done(function () {
+                    Data.set('cart', {});
+                    fullScreenLoader.stopLoader();
+                    window.location.href = urlBuilder.build('checkout/onepage/success');
+                });
+            },
+
+            isGuest: function () {
+                var mageStorage = JSON.parse(window.localStorage['mage-cache-storage']);
+
+                if (typeof mageStorage.customer === 'undefined') {
+                    return true;
+                }
+
+                if (typeof mageStorage.customer.firstname === 'undefined') {
+                    return true;
+                }
+
+                return false;
             }
         });
     }

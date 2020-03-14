@@ -195,33 +195,6 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      */
     public $recurringOccurence;
 
-    /**
-     * Payment constructor.
-     * @param \Magento\Framework\Model\Context $context
-     * @param \Magento\Framework\Registry $registry
-     * @param RequestFactory $requestFactory
-     * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
-     * @param \Magento\Framework\DataObject\Factory $responseFactory
-     * @param \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory
-     * @param \Magento\Payment\Helper\Data $paymentData
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Payment\Model\Method\Logger $logger
-     * @param \Magento\Framework\Module\ModuleListInterface $moduleList
-     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
-     * @param chHelper $dataHelper
-     * @param \Magento\Sales\Model\OrderFactory $orderFactory
-     * @param \Magento\Sales\Model\Service\InvoiceService $invoiceService
-     * @param \Magento\Framework\DB\Transaction $transaction
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
-     * @param OrderSender $orderSender
-     * @param \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
-     * @param OrderModel $orderModel
-     * @param \Magento\Sales\Model\Order\Status $status
-     * @param null $resource
-     * @param null $resourceCollection
-     * @param array $data\
-     */
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
@@ -752,14 +725,31 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
     }
 
     /**
-     * Update the CC info during the checkout process.
-     *
-     * @param \Magento\Framework\DataObject|mixed $data
+     * @param \Magento\Framework\DataObject $data
      * @return $this
+     * @throws LocalizedException
      */
     public function assignData(\Magento\Framework\DataObject $data)
     {
         parent::assignData($data);
+
+        if (isset($data->getData('additional_data')['moneris_checkout_ticket'])) {
+            /** @var \Moneris\MonerisCheckout\Helper\Data $monerisCheckoutData */
+            $monerisCheckoutData = ObjectManager::getInstance()->get(\Moneris\MonerisCheckout\Helper\Data::class);
+            $receiptData = $monerisCheckoutData->getReceiptData($data->getData('additional_data')['moneris_checkout_ticket']);
+
+            if ($receiptData['response']['success'] === "true") {
+                $info = $this->getInfoInstance();
+                $info->setAdditionalInformation('moneris_checkout_mode', true);
+                $receipt = $receiptData['response'];
+                /** @var Registry $register */
+                $register = ObjectManager::getInstance()->get(Registry::class);
+                $register->register('moneris_checkout_receipt', $receipt);
+
+            } else {
+                throw new LocalizedException(__('Get receipt request failed'));
+            }
+        }
 
         // From Magento 2.0.7 onwards, the data is passed in a different property
         $additionalData = $data->getAdditionalData();
@@ -841,6 +831,22 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                 return $this;
             }
 
+            if ($register->registry('moneris_checkout_receipt')) {
+                $receipt = $register->registry('moneris_checkout_receipt');
+                $quoteId = $this->payment->getOrder()->getQuoteId();
+
+                if ($quoteId == $receipt['request']['cart']['quote_id']
+                    //&& $receipt['request']['txn_total'] >= $this->payment->getOrder()->getGrandTotal()
+                ) {
+                    $this->payment->setAdditionalInformation('moneris_checkout_receipt', $receipt['request']['ticket']);
+                    //$this->payment->setTransactionId($receipt['receipt']['cc']['reference_no']);
+
+                    return $this;
+                } else {
+                    throw new LocalizedException(__('cheating'));
+                }
+            }
+
             return $this->processTransaction(self::AUTHORIZE);
         } catch (\Exception $exception) {
             throw new LocalizedException(__('We cannot process your payment. Please try using another card or call your bank.'));
@@ -858,6 +864,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      */
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+
         try {
             $this->psrLogger->info("capture");
             $this->payment = $payment;
@@ -874,6 +881,22 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                 $this->payment->setCcTransId($this->payment->getAdditionalInformation('moneris_trans_id'));
                 $this->payment->setTransactionId($this->payment->getAdditionalInformation('moneris_trans_id'));
                 return $this;
+            }
+
+            if ($register->registry('moneris_checkout_receipt')) {
+                $receipt = $register->registry('moneris_checkout_receipt');
+                $quoteId = $this->payment->getOrder()->getQuoteId();
+
+                if ($quoteId == $receipt['request']['cart']['quote_id']
+                    //&& $receipt['request']['txn_total'] >= $this->payment->getOrder()->getGrandTotal()
+                ) {
+                    $this->payment->setAdditionalInformation('moneris_checkout_receipt', $receipt['request']['ticket']);
+                    //$this->payment->setTransactionId($receipt['receipt']['cc']['reference_no']);
+
+                    return $this;
+                } else {
+                    throw new LocalizedException(__('cheating'));
+                }
             }
 
             return $this->processTransaction(self::CAPTURE);

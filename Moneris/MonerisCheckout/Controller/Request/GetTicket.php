@@ -114,8 +114,11 @@ class Getticket extends Action
         if (empty($userId)) {
             $quoteId = $this->checkoutSession->getQuoteId();
             $quote = $this->quoteRepository->get($quoteId);
+            $quoteMask = $this->getQuoteMaskIdFromQuoteId($quoteId);
         } else {
+            $quoteMask = '';
             $quote = $this->quoteRepository->getActiveForCustomer($userId);
+            $quoteId = $quote->getId();
         }
 
         /** @var Quote $quote */
@@ -126,22 +129,23 @@ class Getticket extends Action
         $requestData->checkout_id = $this->data->getCheckoutId();
         $requestData->integrator = "cr_dev";
         $requestData->txn_total = $this->formatPrice($quote->getGrandTotal());
-        $requestData->environment = 'qa';
+        $requestData->environment = $this->data->getMode();
         $requestData->action = "preload";
-        $requestData->order_no = "";
+        $requestData->order_no = md5($quoteId . $this->data->getApiToken() . $this->data->getCheckoutId());
         $requestData->cust_id = "chkt - cust";
         $requestData->dynamic_descripto = "dyndesc";
         $requestData->cart = new \stdClass;
         $requestData->cart->items = [];
         $requestData->shipping_rates = [];
+
         $newRate = new \stdClass();
 
         $newRate->code = "code01";
         $newRate->description = "Standard";
         $newRate->date = "3 days";
-        $newRate->amount = "$200.00";
-        $newRate->txn_taxes = "16.80";
-        $newRate->txn_total = "1202.80";
+        $newRate->amount = "$10";
+        $newRate->txn_taxes = "1.00";
+        $newRate->txn_total = "10.00";
         $newRate->default_rate = "false";
         $requestData->shipping_rates[] = $newRate;
 
@@ -170,11 +174,9 @@ class Getticket extends Action
             }
         }
 
-        $requestData->subtotal = $this->formatPrice($quote->getGrandTotal());
+        $requestData->cart->quote_id = $quoteId;
 
-        // Skip taxes for now
-        /*$requestData->tax = new \stdClass();
-        $requestData->tax->amount = $quote->getGrandTotal();*/
+        $requestData->subtotal = $this->formatPrice($quote->getGrandTotal());
 
         $response = $client->post($url,
             ['body' => json_encode(
@@ -185,7 +187,16 @@ class Getticket extends Action
         $body = json_decode($response->getBody()->getContents(), true);
 
         if ($body['response']['success'] === "true") {
-            $result->setData($body['response']['ticket']);
+            $result->setData([
+                'ticket' => $body['response']['ticket'],
+                'quote_id' => $quoteMask,
+                'user' => $userId,
+            ]);
+        } else {
+            var_dump($body);
+            $result->setData([
+                'success' => false,
+            ]);
         }
 
         return $result;
