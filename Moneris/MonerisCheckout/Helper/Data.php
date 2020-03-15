@@ -6,7 +6,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientFactory;
 
-class Data
+class Data implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
     const PREREQUEST_ENDPOINT = 'https://gatewayt.moneris.com/chkt/request/request.php';
     /** @var ScopeConfigInterface */
@@ -15,13 +15,18 @@ class Data
     /** @var ClientFactory */
     private $clientFactory;
 
+    /** @var \Moneris\CreditCard\Helper\Data */
+    private $creditCardHelper;
+
     public function __construct(
         ScopeConfigInterface $storeConfig,
+        \Moneris\CreditCard\Helper\Data $creditCardHelper,
         ClientFactory $clientFactory
     )
     {
         $this->scopeConfig = $storeConfig;
         $this->clientFactory = $clientFactory;
+        $this->creditCardHelper = $creditCardHelper;
     }
 
     public function getReceiptData($ticket)
@@ -59,21 +64,26 @@ class Data
 
     public function getStoreId()
     {
-        return 'monca04342';
+        return $this->creditCardHelper->getMonerisStoreId();
     }
 
     public function getApiToken()
     {
-        return 'kkwS8tBGaPfY3OAaITKd';
+        return $this->creditCardHelper->getMonerisApiToken();
     }
 
     public function getCheckoutId()
     {
-        return 'chkt5DY2N04342';
+        return $this->scopeConfig->getValue('payment/moneris/chmonerischeckout/moneris_checkout_id');
+    }
+
+    public function isActive()
+    {
+        return (bool)$this->scopeConfig->isSetFlag('payment/moneris/chmonerischeckout/enable_moneris_checkout_mode');
     }
 
     public function getMode()
     {
-        return 'qa';
+        return $this->creditCardHelper->isCCTestMode() ? 'qa' : 'live';
     }
 }

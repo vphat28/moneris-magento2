@@ -1,3 +1,5 @@
-<div id="monerischeckout-payment-request-button-minicart" style="padding: 0px 10px; margin-top: 10px; margin-bottom: 15px;" data-payment-element-minicart="1" data-bind="afterRender: initMonerisCheckout()">
+<if args="isMonerisCheckoutActive()">
+<div  id="monerischeckout-payment-request-button-minicart" style="padding: 0px 10px; margin-top: 10px; margin-bottom: 15px;" data-payment-element-minicart="1" data-bind="afterRender: initMonerisCheckout();">
     <button style="width: 100%;font-size: 1.3em;padding: 15px;" class="action primary checkout" data-bind="click: openIframe"><translate args="'Moneris Checkout'" /></button>
 </div>
+</if>

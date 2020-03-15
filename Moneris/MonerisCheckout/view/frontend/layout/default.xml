@@ -21,5 +21,12 @@
                 </argument>
             </arguments>
         </referenceBlock>
+        <referenceContainer name="content">
+            <block name="moneris_checkout_config" class="Magento\Framework\View\Element\Template" template="Moneris_MonerisCheckout::config.phtml">
+                <arguments>
+                    <argument name="moneris_checkout" xsi:type="object">Moneris\MonerisCheckout\Helper\Data</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
     </body>
 </page>

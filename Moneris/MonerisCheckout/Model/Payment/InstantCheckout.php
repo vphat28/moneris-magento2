@@ -11,11 +11,13 @@ class InstantCheckout extends Adapter
 
     public function capture(InfoInterface $payment, $amount)
     {
+        die('no');
         return $this;
     }
 
     public function authorize(InfoInterface $payment, $amount)
     {
+        die('no');
         return $this;
     }
 }

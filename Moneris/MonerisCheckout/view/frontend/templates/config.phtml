@@ -1,0 +1,13 @@
+<?php
+
+$helper = $this->getData('moneris_checkout');
+
+?>
+<script type="text/javascript">
+    window.MonerisCheckoutConfig = <?php
+        echo json_encode([
+            'enable' => $helper->isActive(),
+            'mode' => $helper->getMode(),
+        ]);
+    ?>;
+</script>

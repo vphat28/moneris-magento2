@@ -19,6 +19,10 @@ define(
 
             cartId: null,
 
+            isMonerisCheckoutActive: function () {
+                return window.MonerisCheckoutConfig.enable;
+            },
+
             initialize: function () {
                 this._super();
 
@@ -68,7 +72,11 @@ define(
                 $(document).ready(function () {
                     self.myCheckout = new monerisCheckout();
                     var res = {};
-                    self.myCheckout.setMode("dev");
+
+                    if (window.MonerisCheckoutConfig.mode == 'qa') {
+                        self.myCheckout.setMode("dev");
+                    }
+
                     self.myCheckout.setCheckoutDiv("monerisCheckout");
 
                     self.myCheckout.setCallback("address_change", myAddressChange);
