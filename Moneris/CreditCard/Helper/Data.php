@@ -200,11 +200,21 @@ class Data extends AbstractHelper
         '970' => 'Terminal/Clerk table full',
     ];
 
+    /** @var \Magento\Framework\Encryption\EncryptorInterface */
+    private $encryptor;
+
     /**
      * @var ObjectFactory
      */
     protected $objectFactory;
-    
+
+    public function __construct(\Magento\Framework\App\Helper\Context $context, \Moneris\CreditCard\Logger\Logger $logger, \Moneris\CreditCard\Model\ObjectFactory $objectFactory, \Magento\Framework\Registry $registry, \Magento\Framework\App\CacheInterface $cacheManager,
+                                \Magento\Framework\Encryption\EncryptorInterface $encryptor)
+    {
+        $this->encryptor = $encryptor;
+        parent::__construct($context, $logger, $objectFactory, $registry, $cacheManager);
+    }
+
     public function getFormattedExpiry($month, $year)
     {
         return substr(sprintf('%04d', $year), -2) .
@@ -248,11 +258,11 @@ class Data extends AbstractHelper
 
     public function isCCTestMode()
     {
-        return (bool)$this->getConfigData('payment/chmoneriscc/testmode');
+        return (bool)$this->scopeConfig->isSetFlag('payment/moneris/chmoneriscc/testmode');
     }
     public function isTest()
     {
-        return (bool)$this->getConfigData('payment/chmoneriscc/testmode');
+        return (bool)$this->scopeConfig->isSetFlag('payment/moneris/chmoneriscc/testmode');
     }
 
     public function getObject($class)
@@ -329,22 +339,12 @@ class Data extends AbstractHelper
     
     public function getMonerisStoreId()
     {
-        $storeId = $this->getModuleConfig('login');
-        if ($this->isAlternateCurrency()) {
-            $storeId =  $this->getModuleConfig('alternate_login');
-        }
-        
-        return $storeId;
+        return $this->encryptor->decrypt($this->scopeConfig->getValue('payment/moneris/chmoneriscc/login'));
     }
     
     public function getMonerisApiToken()
     {
-        $password = $this->getModuleConfig('password');
-        if ($this->isAlternateCurrency()) {
-            $password = $this->getModuleConfig('alternate_password');
-        }
-        
-        return $password;
+        return $this->encryptor->decrypt($this->scopeConfig->getValue('payment/moneris/chmoneriscc/password'));
     }
     
     public function getPaymentAction()

@@ -8,6 +8,7 @@
                     <field id="enable_moneris_checkout_mode" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Enable Moneris Checkout</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>The value at "Stores => General => State Option => State is Required for" should be null because states in Moneris Checkout don't match with ones in Magento</comment>
                     </field>
 
                     <field id="moneris_checkout_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
