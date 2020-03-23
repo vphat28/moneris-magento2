@@ -14,7 +14,7 @@
                 <cctypes>AE,VI,MC,DI</cctypes>
                 <debug>0</debug>
                 <test>1</test>
-                <title>Moneris OnSite Credit Card Processing Provided by CollinsHarper.com</title>
+                <title>Moneris Checkout</title>
                 <payment_action>authorize</payment_action>
                 <allowspecific>0</allowspecific>
                 <currency>CAD</currency>

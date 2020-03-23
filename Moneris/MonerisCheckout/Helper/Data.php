@@ -74,12 +74,12 @@ class Data implements \Magento\Framework\View\Element\Block\ArgumentInterface
 
     public function getCheckoutId()
     {
-        return $this->scopeConfig->getValue('payment/moneris/chmonerischeckout/moneris_checkout_id');
+        return $this->scopeConfig->getValue('payment/moneris/chmoneriscc/moneris_checkout_id');
     }
 
     public function isActive()
     {
-        return (bool)$this->scopeConfig->isSetFlag('payment/moneris/chmonerischeckout/enable_moneris_checkout_mode');
+        return (bool)$this->scopeConfig->isSetFlag('payment/moneris/chmoneriscc/active');
     }
 
     public function getMode()
