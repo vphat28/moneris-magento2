@@ -20,12 +20,7 @@
                     </field>
                     <field id="title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Title</label>
-                    </field>
-                    <field id="usapi" translate="label_tooltip" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Use US API</label>
-                        <tooltip>If you are a US Corporation taking USD payments this should be set to yes. This is not for a Canadian Corporation taking USD.</tooltip>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    </field>
+                    </field> 
                     <field id="cctypes" translate="label" type="multiselect" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Credit Card Types</label>
                         <source_model>Moneris\CreditCard\Model\Source\Cctype</source_model>

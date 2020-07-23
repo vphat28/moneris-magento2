@@ -81,7 +81,7 @@ class PreAuth extends Transaction
             $ccNumber = $this->getHelper()->getCheckoutSession()->getMonerisccCcNumber();
         }
 
-        return [
+        $return = [
             'type'          => $this->_requestType,
             'order_id'      => $this->generateUniqueOrderId(),
             'cust_id'       => $this->getCustomerId(),
@@ -90,6 +90,11 @@ class PreAuth extends Transaction
             'expdate'       => $this->getFormattedExpiry($payment),
             self::CRYPT_FIELD   => $this->getCryptType()
         ];
+
+
+	    file_put_contents(BP . '/var/log/ch_moneris.log', PHP_EOL . print_r($return, 1), FILE_APPEND);
+
+        return $return;
     }
 
 

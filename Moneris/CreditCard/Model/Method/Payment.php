@@ -268,9 +268,10 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         }
         
         $content = __CLASS__ . ($lineNumber ? ":{$lineNumber}" : '') . " " .  print_r($x, true);
-        $this->getHelper()->log($content);
+	    file_put_contents(BP . '/var/log/ch_moneris.log', PHP_EOL . $content, FILE_APPEND);
 
-        return $this;
+
+	    return $this;
     }
 
     public function getHelper()
@@ -838,7 +839,11 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                 if ($quoteId == $receipt['request']['cart']['quote_id']
                     //&& $receipt['request']['txn_total'] >= $this->payment->getOrder()->getGrandTotal()
                 ) {
+                	  $this->log($receipt);
                     $this->payment->setAdditionalInformation('moneris_checkout_receipt', $receipt['request']['ticket']);
+                    $this->payment->setAdditionalInformation('receipt_id', $receipt["receipt"]["cc"]["order_no"]);
+                    $this->payment->setCcTransId($receipt["receipt"]["cc"]["transaction_no"]);
+                    $this->payment->setLastTransId($receipt["receipt"]["cc"]["transaction_no"]);
                     //$this->payment->setTransactionId($receipt['receipt']['cc']['reference_no']);
 
                     return $this;

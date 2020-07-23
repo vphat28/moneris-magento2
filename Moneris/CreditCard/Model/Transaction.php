@@ -338,6 +338,7 @@ class Transaction extends AbstractModel
             if (!$txnArray) {
                 $txnArray = $this->buildTransactionArray();
             }
+            file_put_contents(BP . '/var/log/ch_moneris.log', PHP_EOL . print_r($txnArray, 1), FILE_APPEND);
             $result = $this->_post($txnArray, $save);
             $this->setResult($result);
         } catch (\Exception $e) {
