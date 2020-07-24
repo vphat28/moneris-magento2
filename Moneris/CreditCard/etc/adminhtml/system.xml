@@ -50,13 +50,7 @@
                     <field id="testmode" translate="label" type="select" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Test Mode</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    </field>
-
-                    <field id="debug" translate="label_tooltip" type="select" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Debug Mode</label>
-                        <tooltip>Will log detailed information, this feature is not PCI compliant.</tooltip>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    </field>
+                    </field> 
 
                     <field id="allowspecific" translate="label" type="allowspecific" sortOrder="79" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Payment from Applicable Countries</label>
@@ -79,11 +73,7 @@
     				<field id="order_status" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>New Order Status</label>
                         <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
-                    </field>
-                    <field id="sort_order" translate="label" type="text" sortOrder="888" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Sort Order</label>
-                        <frontend_class>validate-number</frontend_class>
-                    </field>
+                    </field> 
                 </group> 
             </group>
         </section>
