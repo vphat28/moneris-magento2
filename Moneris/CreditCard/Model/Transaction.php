@@ -254,17 +254,30 @@ class Transaction extends AbstractModel
     {
         $payment = $this->getPayment();
         $methodCode = $payment->getMethodInstance()->getCode();
+        $magentoStore = null;
 
-        $storeId = $this->getHelper()->getConfigData("payment/".$methodCode."/login", true);
-
-        if (empty($storeId)) {
-            $storeId = $this->getHelper()->getConfigData("payment/moneris/".$methodCode."/login", true);
+        if ($this->_registry->registry('current_invoice') !== null) {
+          /** @var \Magento\Sales\Model\Order\Invoice $currentInvoice */
+          $currentInvoice = $this->_registry->registry('current_invoice');
+          $magentoStore = $currentInvoice->getStore();
         }
 
-        $apiToken =  $this->getHelper()->getConfigData("payment/".$methodCode."/password", true);
+        if ($this->_registry->registry('current_creditmemo') !== null) {
+          /** @var \Magento\Sales\Model\Order\Creditmemo $currentMemo */
+          $currentMemo = $this->_registry->registry('current_creditmemo');
+          $magentoStore = $currentMemo->getStore();
+        }
+
+        $storeId = $this->getHelper()->getConfigData("payment/".$methodCode."/login", true, $magentoStore);
+
+        if (empty($storeId)) {
+            $storeId = $this->getHelper()->getConfigData("payment/moneris/".$methodCode."/login", true, $magentoStore);
+        }
+
+        $apiToken =  $this->getHelper()->getConfigData("payment/".$methodCode."/password", true, $magentoStore);
 
         if (empty($apiToken)) {
-            $apiToken =  $this->getHelper()->getConfigData("payment/moneris/".$methodCode."/password", true);
+            $apiToken =  $this->getHelper()->getConfigData("payment/moneris/".$methodCode."/password", true, $magentoStore);
         }
 
         $this->getHelper()->log(__FILE__." ".__LINE__." store $storeId");

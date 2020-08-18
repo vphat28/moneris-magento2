@@ -26,14 +26,14 @@
                          </depends>
                     </field>
     				
-                    <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Store ID</label>
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                         <depends>
                                 <field id="enable_vault">1</field>
                          </depends>
                     </field>
-                    <field id="password" translate="label" type="obscure" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="password" translate="label" type="obscure" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>API Token</label>
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                         <depends>
@@ -103,11 +103,11 @@
                         <config_path>payment/chmoneriscc/cctypes</config_path>
                     </field>
 
-                    <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Store ID</label>
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     </field>
-                    <field id="password" translate="label" type="obscure" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="password" translate="label" type="obscure" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>API Token</label>
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     </field>
