@@ -791,17 +791,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
     public function getConfigPaymentAction()
     {
-        $action = parent::getConfigPaymentAction();
-
-        /** @var Registry $register */
-        $register = ObjectManager::getInstance()->get(Registry::class);
-        $byPass = $register->registry('by_pass_authorize_payment');
-
-        if ($byPass) {
-            $action = self::ACTION_AUTHORIZE_CAPTURE;
-        }
-
-        return $action;
+        return self::ACTION_AUTHORIZE;
     }
 
     /**
@@ -841,6 +831,8 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                 ) {
                 	  $this->log($receipt);
                     $this->payment->setAdditionalInformation('moneris_checkout_receipt', $receipt['request']['ticket']);
+                    $this->payment->setAdditionalInformation('moneris_checkout_payment_action', $receipt["receipt"]["cc"]["transaction_code"]);
+
                     $this->payment->setAdditionalInformation('receipt_id', $receipt["receipt"]["cc"]["order_no"]);
                     $this->payment->setCcTransId($receipt["receipt"]["cc"]["transaction_no"]);
                     $this->payment->setLastTransId($receipt["receipt"]["cc"]["transaction_no"]);

@@ -193,7 +193,6 @@ class Getticket extends Action
                 'user' => $userId,
             ]);
         } else {
-            var_dump($body);
             $result->setData([
                 'success' => false,
             ]);

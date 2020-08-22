@@ -59,10 +59,6 @@
                         <tooltip>Use the customers name to generate a unique ID to send to moneris (* instead of only the Customer ID.</tooltip>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
-                    <field id="payment_action" translate="label_tooltip" type="select" sortOrder="84" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Payment Action</label>
-                        <source_model>Moneris\CreditCard\Model\Source\PaymentAction</source_model>
-                    </field>
     				<field id="order_status" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>New Order Status</label>
                         <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
