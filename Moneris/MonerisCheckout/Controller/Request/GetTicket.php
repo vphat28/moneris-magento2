@@ -138,17 +138,6 @@ class Getticket extends Action
         $requestData->cart->items = [];
         $requestData->shipping_rates = [];
 
-        $newRate = new \stdClass();
-
-        $newRate->code = "code01";
-        $newRate->description = "Standard";
-        $newRate->date = "3 days";
-        $newRate->amount = "$10";
-        $newRate->txn_taxes = "1.00";
-        $newRate->txn_total = "10.00";
-        $newRate->default_rate = "false";
-        $requestData->shipping_rates[] = $newRate;
-
         $quoteItems = $quote->getItems();
         $placeHolderImage = $this->getPlaceHolderImages();
 

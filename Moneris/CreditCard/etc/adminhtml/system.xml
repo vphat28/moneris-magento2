@@ -10,58 +10,93 @@
         <section id="payment">
         <group id="moneris" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Moneris Payments</label>
-            <comment><![CDATA[<b>Please contact Moneris to set up your merchant account and mention configuration code ECNP-00228. It will facilitate the onboarding process.</b>]]></comment>
+            <comment><![CDATA[<img src='https://www.moneris.com/-/media/Moneris/Files/EN/Moneris-Logos/Moneris_MD_BIL_CMYK_2016.ashx?h=59&w=166&hash=5E684F4C56A2FFCA6DA0A48FDC19C909'/><br><b>Accept payments on your website</b>
+            <br>
+With Moneris Checkout, a
+comprehensive online payment solution,
+you can easily and securely process
+customer transactions on your website.
+Bring the power of ecommerce to your
+website with Moneris Checkout.
+<br><br>
+Don’t have an account with Moneris
+yet? It’s easy to get started. Call
+Moneris at 1-855-232-2365 and mention
+configuration code ECNP-00444.]]></comment>
                 <group id="chmoneriscc" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1" >
-                    <label>Moneris Checkout Settings</label>
+                    <label>Moneris Checkout account details</label>
+                    <comment><![CDATA[Login to the <a href='https://www3.moneris.com/mpg/'>Moneris Merchant Resource
+                        Center</a> (MRC) to create your Moneris
+                        Checkout configuration so that you can
+                        integrate Moneris payments into your
+                        ecommerce website.]]></comment>
                     <attribute type="expanded">1</attribute>
                     <field id="active" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Enabled</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <tooltip>Click the drop-down and select Yes to
+                            enable Moneris payments.</tooltip>
                     </field>
                     <field id="title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Title</label>
-                    </field> 
-                    <field id="cctypes" translate="label" type="multiselect" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Credit Card Types</label>
-                        <source_model>Moneris\CreditCard\Model\Source\Cctype</source_model>
-                        <config_path>payment/chmoneriscc/cctypes</config_path>
+                        <tooltip>This is the label for the integration in
+                            the Magento administrative tool. This
+                            will not be visible to online shoppers.</tooltip>
                     </field>
 
                     <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Store ID</label>
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <tooltip><![CDATA[
+                            The Store ID is sent to you in your
+                            Welcome email when you first sign up
+                            for Moneris. It is the same Store ID that
+                            you use when you login to the <a href='https://www3.moneris.com/mpg/'>Moneris Merchant Resource
+                        Center</a>.
+                            ]]></tooltip>
                     </field>
                     <field id="password" translate="label" type="obscure" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>API Token</label>
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <tooltip>
+                            <![CDATA[
+                            The API Token is a store-specific string
+                            of alphanumeric characters. Retrieve
+                            from <b>Admin > Store Settings</b> in
+                            <a href='https://www3.moneris.com/mpg/'>Moneris Merchant Resource Center</a>.
+                            ]]>
+                        </tooltip>
                     </field>
 
                     <field id="moneris_checkout_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Moneris Checkout ID</label>
+                        <tooltip><![CDATA[
+                            The Checkout ID is generated when
+                            Moneris Checkout is configured.
+                            Retrieve from <b>Admin > Moneris
+                            Checkout Config</b> in <a href='https://www3.moneris.com/mpg/'>Moneris Merchant Resource
+                        Center</a>.
+                            ]]>
+                        </tooltip>
                     </field>
 
                     <field id="testmode" translate="label" type="select" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Test Mode</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    </field> 
-
-                    <field id="allowspecific" translate="label" type="allowspecific" sortOrder="79" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Payment from Applicable Countries</label>
-                        <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
-                    </field>
-
-                    <field id="specificcountry" translate="label" type="multiselect" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Payment from Specific Countries</label>
-                        <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
-                    </field>
-                    <field id="use_customer_name" translate="label_tooltip" type="select" sortOrder="84" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Customer Name for ID</label>
-                        <tooltip>Use the customers name to generate a unique ID to send to moneris (* instead of only the Customer ID.</tooltip>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <tooltip>Enable Test Mode to conduct test
+                            transactions, and to control if those
+                            transactions are processed</tooltip>
                     </field>
     				<field id="order_status" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>New Order Status</label>
-                        <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        <tooltip>
+                            <![CDATA[
+                            The status of an order placed by a
+                            customer will display either Processing
+                            or ?.
+                            ]]>
+                        </tooltip>
                     </field> 
                 </group> 
             </group>
