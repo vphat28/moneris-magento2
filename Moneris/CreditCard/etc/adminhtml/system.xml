@@ -44,8 +44,8 @@ configuration code ECNP-00444.]]></comment>
                             will not be visible to online shoppers.</tooltip>
                     </field>
 
-                    <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Store ID</label>
+                    <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>StoreID</label>
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                         <tooltip><![CDATA[
                             The Store ID is sent to you in your
