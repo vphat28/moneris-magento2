@@ -131,12 +131,11 @@ class Getticket extends Action
         $requestData->txn_total = $this->formatPrice($quote->getGrandTotal());
         $requestData->environment = $this->data->getMode();
         $requestData->action = "preload";
-        $requestData->order_no = md5($quoteId . $this->data->getApiToken() . $this->data->getCheckoutId());
+        $requestData->order_no = $quoteId . '_' . time();
         $requestData->cust_id = "chkt - cust";
         $requestData->dynamic_descripto = "dyndesc";
         $requestData->cart = new \stdClass;
         $requestData->cart->items = [];
-        $requestData->shipping_rates = [];
 
         $quoteItems = $quote->getItems();
         $placeHolderImage = $this->getPlaceHolderImages();
@@ -161,6 +160,30 @@ class Getticket extends Action
 
                 $requestData->cart->items[] = $itemDataToSend;
             }
+        }
+
+//        $customer = $quote->getCustomer();
+        $shipping = $quote->getShippingAddress();
+        $billing = $quote->getBillingAddress();
+
+        if ($this->data->isShippingMode()) {
+            $requestData->shipping_details              = new \stdClass();
+            $requestData->shipping_details->address_1   = $shipping->getStreet();
+//            $requestData->shipping_details->address_2   = $customer->get_shipping_address_2();
+            $requestData->shipping_details->city        = $shipping->getCity();
+            $requestData->shipping_details->province    = $shipping->getRegion();
+            $requestData->shipping_details->country     = $shipping->getCountry();
+            $requestData->shipping_details->postal_code = $shipping->getPostcode();
+        }
+
+        if ($this->data->isBillingMode()) {
+            $requestData->billing_details              = new \stdClass();
+            $requestData->billing_details->address_1   = $billing->getStreet();
+            //$requestData->billing_details->address_2   = $billing->get();
+            $requestData->billing_details->city        = $billing->getCity();
+            $requestData->billing_details->province    = $billing->getRegion();
+            $requestData->billing_details->country     = $billing->getCountry();
+            $requestData->billing_details->postal_code = $billing->getPostcode();
         }
 
         $requestData->cart->quote_id = $quoteId;

@@ -32,26 +32,7 @@
                                                                         </item>
                                                                     </item>
                                                                 </item>
-                                                                
-                                                                <!-- Hosted Integration -->
-                                                                <item name="chmonerisredirect" xsi:type="array">
-                                                                    <item name="component" xsi:type="string">Moneris_CreditCard/js/view/payment/chmonerisredirect</item>
-                                                                    <item name="methods" xsi:type="array">
-                                                                        <item name="chmonerisredirect" xsi:type="array">
-                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
-                                                                        </item>
-                                                                    </item>
-                                                                </item>
-                                                                
-                                                                <!-- Interac Online -->
-                                                                <item name="chmonerisinterac" xsi:type="array">
-                                                                    <item name="component" xsi:type="string">Moneris_CreditCard/js/view/payment/chmonerisinterac</item>
-                                                                    <item name="methods" xsi:type="array">
-                                                                        <item name="chmonerisinterac" xsi:type="array">
-                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
-                                                                        </item>
-                                                                    </item>
-                                                                </item>
+
                                                             </item>
                                                         </item>
                                                     </item>

@@ -1,4 +1,4 @@
- /**
+/**
  * Copyright © 2016 Collinsharper. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -11,6 +11,12 @@ define(
     ],
     function (Component, rendererList) {
         'use strict';
+        rendererList.push(
+            {
+                type: 'monerisinstantcheckout',
+                component: 'Moneris_MonerisCheckout/js/view/payment/renderer/chmonerischeckout'
+            }
+        );
         /** Add view logic here if needed */
         return Component.extend({});
     }

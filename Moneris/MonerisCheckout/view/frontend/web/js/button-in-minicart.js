@@ -186,7 +186,7 @@ define(
 
                 if (!this.isInCheckoutPages) {
                     $('body').append('<div id="monerisCheckout" style="z-index: 9999"></div>');
-                    var url = "https://gatewaydev.moneris.com/chkt/js/chkt_v1.00.js";
+                    var url = "https://gatewayt.moneris.com/chkt/js/chkt_v1.00.js";
 
                     $.getScript(url, function () {
                         self.configureButton();
