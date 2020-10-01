@@ -72,6 +72,8 @@ define(
                     }
 
                     function myPaymentComplete(data) {
+                        data = JSON.parse(data);
+
                         if (self.showReceipt === true) {
                             self.myCheckout.closeCheckout();
                             console.log(data);
