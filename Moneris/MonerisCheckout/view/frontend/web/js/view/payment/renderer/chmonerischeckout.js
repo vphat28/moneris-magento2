@@ -19,6 +19,7 @@ define(
                 return true;
             },
             monerisTicket: null,
+            showReceipt: false,
             defaults: {
                 template: 'Moneris_MonerisCheckout/payment/chmonerischeckout',
 
@@ -71,11 +72,16 @@ define(
                     }
 
                     function myPaymentComplete(data) {
-                        console.log(data);
-                        self.myCheckout.closeCheckout();
+                        if (self.showReceipt === true) {
+                            self.myCheckout.closeCheckout();
+                            console.log(data);
+                        } else {
+                            self.chargeRequest(data.ticket);
+                        }
                     }
 
                     function myPaymentReceipt(data) {
+                        self.showReceipt = true;
                         data = JSON.parse(data);
                         console.log(data);
 
