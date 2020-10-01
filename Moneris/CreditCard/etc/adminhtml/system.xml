@@ -89,7 +89,7 @@ configuration code ECNP-00444.]]></comment>
                     </field>
 
                     <field id="shipping_mode" translate="label" type="select" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Enable Mode</label>
+                        <label>Enable Shipping</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <tooltip>Shipping info will be added to preload request</tooltip>
                     </field>
