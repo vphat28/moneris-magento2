@@ -41,7 +41,9 @@ define(
                 }).done(function (returnData) {
                     // Close payment sheet with success message
                     // self.cartId = returnData.quote_id;
+                    if (typeof returnData !== 'undefined') {
                     self.myCheckout.startCheckout(returnData.ticket);
+                    }
                 }).fail(function () {
                     //fullScreenLoader.stopLoader();
                 });

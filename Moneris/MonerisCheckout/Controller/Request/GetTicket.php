@@ -173,7 +173,7 @@ class Getticket extends Action
 
         if ($this->data->isShippingMode()) {
             $requestData->shipping_details              = new \stdClass();
-            $requestData->shipping_details->address_1   = $shipping->getStreet();
+            $requestData->shipping_details->address_1   =  is_array($shipping->getStreet()) ? implode(' ', $shipping->getStreet()) : (string)$shipping->getStreet();
 //            $requestData->shipping_details->address_2   = $customer->get_shipping_address_2();
             $requestData->shipping_details->city        = $shipping->getCity();
             $requestData->shipping_details->province    = $shipping->getRegion();
@@ -183,7 +183,7 @@ class Getticket extends Action
 
         if ($this->data->isBillingMode()) {
             $requestData->billing_details              = new \stdClass();
-            $requestData->billing_details->address_1   = $billing->getStreet();
+            $requestData->billing_details->address_1   = is_array($billing->getStreet()) ? implode(' ', $billing->getStreet()) : (string)$billing->getStreet();
             //$requestData->billing_details->address_2   = $billing->get();
             $requestData->billing_details->city        = $billing->getCity();
             $requestData->billing_details->province    = $billing->getRegion();
@@ -205,7 +205,10 @@ class Getticket extends Action
 
         $this->logger->debug(json_encode($body));
 
-        if ($body['response']['success'] === "true") {
+        if ($body['response']['success'] === "true" &&
+            isset($body['response']['ticket']) &&
+            !empty($body['response']['ticket'])
+        ) {
             $result->setData([
                 'ticket' => $body['response']['ticket'],
                 'quote_id' => $quoteMask,
