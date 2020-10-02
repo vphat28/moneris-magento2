@@ -40,6 +40,9 @@ class Getticket extends Action
     /** @var Image */
     private $imageHelper;
 
+    /** @var \Moneris\CreditCard\Logger\Logger */
+    private $logger;
+
     public function __construct(
         Context $context,
         UserContextInterface $userContext,
@@ -48,6 +51,7 @@ class Getticket extends Action
         Session $checkoutSession,
         QuoteRepository $quoteRepository,
         ProductRepositoryInterface $productRepository,
+        \Moneris\CreditCard\Logger\Logger $logger,
         Image $imageHelper
     )
     {
@@ -57,6 +61,7 @@ class Getticket extends Action
         $this->checkoutSession = $checkoutSession;
         $this->quoteRepository = $quoteRepository;
         $this->productRepository = $productRepository;
+        $this->logger = $logger;
         $this->imageHelper = $imageHelper;
         parent::__construct($context);
     }
@@ -197,6 +202,8 @@ class Getticket extends Action
         );
 
         $body = json_decode($response->getBody()->getContents(), true);
+
+        $this->logger->debug(json_encode($body));
 
         if ($body['response']['success'] === "true") {
             $result->setData([
