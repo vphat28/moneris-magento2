@@ -100,6 +100,7 @@ class ConfigProvider extends CcGenericConfigProvider
         $config['payment'][$this->code]['isRecurring'] = $this->dataHelper->getConfigData('payment/chmoneriscc/is_recurring');
         $config['payment'][$this->code]['supportedRecurringTerms'] = $this->getSupportedRecurringTerms();
         $config['payment'][$this->code]['storedCards'] = $this->getStoredCards();
+        $config['payment'][$this->code]['title'] = $this->getTitle();
         $config['payment'][$this->code]['canSaveCard'] = $this->canSaveCard();
         $config['payment'][$this->code]['redirectAfterPlaceOrder'] = $this->redirectAfterPlaceOrder();
         $config['payment'][$this->code]['forceSaveCard'] = false;
@@ -183,6 +184,12 @@ class ConfigProvider extends CcGenericConfigProvider
     
         return false;
     }
+
+    public function getTitle()
+    {
+        return $this->dataHelper->getConfigData('payment/moneris/chmoneriscc/title');
+    }
+
     /**
      * Returns applicable stored cards
      *

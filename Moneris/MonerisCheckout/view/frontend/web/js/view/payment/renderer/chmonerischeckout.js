@@ -157,6 +157,9 @@ define(
             getCode: function () {
                 return 'monerisinstantcheckout';
             },
+            getTitle: function () {
+                return window.checkoutConfig.payment.chmoneriscc.title;
+            },
         });
     }
 );
