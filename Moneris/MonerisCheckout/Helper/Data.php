@@ -82,16 +82,6 @@ class Data implements \Magento\Framework\View\Element\Block\ArgumentInterface
         return (bool)$this->scopeConfig->isSetFlag('payment/moneris/chmoneriscc/active');
     }
 
-    public function isShippingMode()
-    {
-        return (bool)$this->scopeConfig->isSetFlag('payment/moneris/chmoneriscc/shipping_mode');
-    }
-
-    public function isBillingMode()
-    {
-        return (bool)$this->scopeConfig->isSetFlag('payment/moneris/chmoneriscc/billing_mode');
-    }
-
     public function getMode()
     {
         return $this->creditCardHelper->isCCTestMode() ? 'qa' : 'live';

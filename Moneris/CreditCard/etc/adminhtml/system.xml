@@ -87,18 +87,6 @@ configuration code ECNP-00444.]]></comment>
                             transactions, and to control if those
                             transactions are processed</tooltip>
                     </field>
-
-                    <field id="shipping_mode" translate="label" type="select" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Enable Shipping</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <tooltip>Shipping info will be added to preload request</tooltip>
-                    </field>
-
-                    <field id="billing_mode" translate="label" type="select" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Enable Billing</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <tooltip>Billing info will be added to preload request</tooltip>
-                    </field>
     				<field id="order_status" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>New Order Status</label>
                         <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>

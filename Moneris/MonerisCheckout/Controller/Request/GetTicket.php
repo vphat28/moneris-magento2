@@ -43,6 +43,9 @@ class Getticket extends Action
     /** @var \Moneris\CreditCard\Logger\Logger */
     private $logger;
 
+    /** @var \Magento\Framework\View\Asset\Repository */
+    protected $assetRepo;
+
     public function __construct(
         Context $context,
         UserContextInterface $userContext,
@@ -52,6 +55,7 @@ class Getticket extends Action
         QuoteRepository $quoteRepository,
         ProductRepositoryInterface $productRepository,
         \Moneris\CreditCard\Logger\Logger $logger,
+        \Magento\Framework\View\Asset\Repository $assetRepo,
         Image $imageHelper
     )
     {
@@ -62,6 +66,7 @@ class Getticket extends Action
         $this->quoteRepository = $quoteRepository;
         $this->productRepository = $productRepository;
         $this->logger = $logger;
+        $this->assetRepo = $assetRepo;
         $this->imageHelper = $imageHelper;
         parent::__construct($context);
     }
@@ -126,6 +131,10 @@ class Getticket extends Action
             $quoteId = $quote->getId();
         }
 
+        $shipping = $quote->getShippingAddress();
+        $shippingCost = $shipping->getShippingAmount();
+        $billing = $quote->getBillingAddress();
+        $shippingIcon = $this->assetRepo->getUrlWithParams('Moneris_MonerisCheckout::images/shipping-icon.png', ['_secure' => true]);
         /** @var Quote $quote */
 
         $requestData = new \stdClass;
@@ -137,7 +146,7 @@ class Getticket extends Action
         $requestData->environment = $this->data->getMode();
         $requestData->action = "preload";
         $requestData->order_no = $quoteId . '_' . time();
-        $requestData->cust_id = "chkt - cust";
+        $requestData->cust_id = $quote->getBillingAddress()->getEmail();
         $requestData->dynamic_descripto = "dyndesc";
         $requestData->cart = new \stdClass;
         $requestData->cart->items = [];
@@ -165,13 +174,22 @@ class Getticket extends Action
 
                 $requestData->cart->items[] = $itemDataToSend;
             }
+
+            if (!empty(floatval($shippingCost))) {
+                $itemDataToSend = new \stdClass();
+                $itemDataToSend->description = (string)__('Shipping cost');
+                $itemDataToSend->unit_cost = $this->formatPrice($shippingCost);
+                $itemDataToSend->quantity = 1;
+                $itemDataToSend->url = $shippingIcon;
+
+                $requestData->cart->items[] = $itemDataToSend;
+            }
         }
 
 //        $customer = $quote->getCustomer();
-        $shipping = $quote->getShippingAddress();
-        $billing = $quote->getBillingAddress();
 
-        if ($this->data->isShippingMode()) {
+
+        {
             $requestData->shipping_details              = new \stdClass();
             $requestData->shipping_details->address_1   =  is_array($shipping->getStreet()) ? implode(' ', $shipping->getStreet()) : (string)$shipping->getStreet();
 //            $requestData->shipping_details->address_2   = $customer->get_shipping_address_2();
@@ -181,7 +199,7 @@ class Getticket extends Action
             $requestData->shipping_details->postal_code = $shipping->getPostcode();
         }
 
-        if ($this->data->isBillingMode()) {
+        {
             $requestData->billing_details              = new \stdClass();
             $requestData->billing_details->address_1   = is_array($billing->getStreet()) ? implode(' ', $billing->getStreet()) : (string)$billing->getStreet();
             //$requestData->billing_details->address_2   = $billing->get();
@@ -191,7 +209,30 @@ class Getticket extends Action
             $requestData->billing_details->postal_code = $billing->getPostcode();
         }
 
+        $requestData->contact_details = new \stdClass();
+        $requestData->contact_details->first_name = $billing->getFirstname();
+        $requestData->contact_details->last_name = $billing->getLastname();;
+        $requestData->contact_details->email = $billing->getEmail();
+        $requestData->contact_details->phone = $billing->getTelephone();
+
+        $total = (float)$quote->getGrandTotal();
+        $tax = $quote->getTotals()['tax'];
+        $tax = $tax->getValue();
+        $total_without_tax = $total - $tax;
+
         $requestData->cart->quote_id = $quoteId;
+        $requestData->cart->subtotal = $total_without_tax;
+
+        if ($tax > 0) {
+            $tax_rate                            = bcdiv(
+                bcmul( $tax, 100, 2 ),
+                $total_without_tax );
+            $tax_desc                            = 'Taxes';
+            $requestData->cart->tax              = new \stdClass();
+            $requestData->cart->tax->amount      = $tax;
+            $requestData->cart->tax->description = $tax_desc;
+            $requestData->cart->tax->rate        = $tax_rate;
+        }
 
         $requestData->subtotal = $this->formatPrice($quote->getGrandTotal());
 

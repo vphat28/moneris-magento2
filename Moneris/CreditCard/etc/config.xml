@@ -14,7 +14,7 @@
                 <cctypes>AE,VI,MC,DI</cctypes>
                 <debug>0</debug>
                 <test>1</test>
-                <title>Moneris Checkout</title>
+                <title>Continue to payment</title>
                 <payment_action>authorize</payment_action>
                 <allowspecific>0</allowspecific>
                 <currency>CAD</currency>

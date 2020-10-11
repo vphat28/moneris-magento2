@@ -19,6 +19,7 @@ define(
                 return true;
             },
             monerisTicket: null,
+            processedOrder: false,
             showReceipt: false,
             defaults: {
                 template: 'Moneris_MonerisCheckout/payment/chmonerischeckout',
@@ -75,8 +76,12 @@ define(
 
                     function myPaymentComplete(data) {
                         data = JSON.parse(data);
+                        console.log(data);
 
                         if (self.showReceipt === true) {
+                            if (!self.processedOrder) {
+                                self.chargeRequest(data.ticket);
+                            }
                             self.myCheckout.closeCheckout();
                             console.log(data);
                         } else {
@@ -90,7 +95,10 @@ define(
                         console.log(data);
 
                         if (data.response_code === '001') {
-                            self.chargeRequest(data.ticket);
+                            setTimeout(
+                                function () {
+                                    self.chargeRequest(data.ticket);
+                                }, 7500);
                         } else {
                             alert('Transaction error. Please try again');
                             self.myCheckout.closeCheckout();
@@ -111,6 +119,7 @@ define(
             chargeRequest: function (ticket) {
                 this.myCheckout.closeCheckout();
                 this.monerisTicket = ticket;
+                this.processedOrder = true;
                 this.placeOrder();
             },
 
