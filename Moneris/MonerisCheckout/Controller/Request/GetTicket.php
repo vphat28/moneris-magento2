@@ -186,9 +186,6 @@ class Getticket extends Action
             }
         }
 
-//        $customer = $quote->getCustomer();
-
-
         {
             $requestData->shipping_details              = new \stdClass();
             $requestData->shipping_details->address_1   =  is_array($shipping->getStreet()) ? implode(' ', $shipping->getStreet()) : (string)$shipping->getStreet();
@@ -258,6 +255,7 @@ class Getticket extends Action
         } else {
             $result->setData([
                 'success' => false,
+                'body' => $body
             ]);
         }
 
