@@ -8,9 +8,10 @@ define(
         'ko',
         'jquery',
         'Magento_Checkout/js/view/payment/default',
-        'mage/url'
+        'mage/url',
+        'Magento_Checkout/js/model/quote'
     ],
-    function (ko, $, Component, urlBuilder) {
+    function (ko, $, Component, urlBuilder, quote) {
         'use strict';
         var config = window.checkoutConfig.payment.chmonerischeckout;
 
@@ -26,6 +27,11 @@ define(
 
             },
 
+            getInputedEmail: function () {
+                if(quote.guestEmail) return quote.guestEmail;
+                else return window.checkoutConfig.customerData.email;
+            },
+
             placeMonerisOrder: function () {
                 var urlXhr = urlBuilder.build('monerischeckout/request/getticket');
 
@@ -35,7 +41,8 @@ define(
                     showLoader: true,
                     url: urlXhr,
                     data: JSON.stringify({
-                        "test": "OK"
+                        "test": "OK",
+                        "email": self.getInputedEmail()
                     }),
                     type: 'post',
                     contentType: 'application/json'

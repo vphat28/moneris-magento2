@@ -206,10 +206,13 @@ class Getticket extends Action
             $requestData->billing_details->postal_code = $billing->getPostcode();
         }
 
+        $postedData = @json_decode(file_get_contents('php://input'), true);
+        $inputedEmail = filter_var($postedData['email'], FILTER_SANITIZE_EMAIL);
+
         $requestData->contact_details = new \stdClass();
         $requestData->contact_details->first_name = $billing->getFirstname();
         $requestData->contact_details->last_name = $billing->getLastname();;
-        $requestData->contact_details->email = $billing->getEmail();
+        $requestData->contact_details->email = empty($billing->getEmail()) ? $inputedEmail : $billing->getEmail();
         $requestData->contact_details->phone = $billing->getTelephone();
 
         $total = (float)$quote->getGrandTotal();
@@ -232,6 +235,8 @@ class Getticket extends Action
         }
 
         $requestData->subtotal = $this->formatPrice($quote->getGrandTotal());
+
+        $this->logger->debug('getting ticket..' . json_encode($requestData));
 
         $response = $client->post($url,
             ['body' => json_encode(
