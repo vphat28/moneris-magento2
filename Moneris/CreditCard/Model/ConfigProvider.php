@@ -187,7 +187,9 @@ class ConfigProvider extends CcGenericConfigProvider
 
     public function getTitle()
     {
-        return $this->dataHelper->getConfigData('payment/moneris/chmoneriscc/title');
+        return empty($this->dataHelper->getConfigData('payment/moneris/chmoneriscc/title')) ?
+            __('Continue with Payments') :
+            $this->dataHelper->getConfigData('payment/moneris/chmoneriscc/title');
     }
 
     /**
