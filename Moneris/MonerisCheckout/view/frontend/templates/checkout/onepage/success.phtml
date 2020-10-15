@@ -1,0 +1,23 @@
+<?php
+/** @var \Moneris\MonerisCheckout\Block\Onepage\Success $block */
+$data = $block->getMonerisData();
+
+if (empty($data)) {
+  return;
+}
+
+?>
+<table style="width: 500px">
+  <tr>
+    <td class="td" scope="col"><b><?php echo $block->escapeHtml(__( 'Transaction Date')); ?></b></td>
+    <td class="td" scope="col"><?php echo $block->escapeHtml($data['moneris_checkout_transaction_date_time']); ?></td>
+  </tr>
+  <tr>
+    <td class="td" scope="col"><b><?php echo $block->escapeHtml(__( 'Transaction Number')); ?></b></td>
+    <td class="td" scope="col"><?php echo $block->escapeHtml($data['moneris_checkout_transaction_no']); ?></td>
+  </tr>
+  <tr>
+    <td class="td" scope="col"><b><?php echo $block->escapeHtml(__( 'Reference Number')); ?></b></td>
+    <td class="td" scope="col"><?php echo $block->escapeHtml($data['moneris_checkout_order_no']); ?></td>
+  </tr>
+</table>

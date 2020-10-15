@@ -61,6 +61,11 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
     protected $_isGateway = true;
     protected $amount;
 
+    /**
+     * @var string
+     */
+    protected $_infoBlockType = \Moneris\MonerisCheckout\Block\Payment\Info::class;
+
     /** @var OrderModel\Payment */
     protected $payment;
 
@@ -257,6 +262,16 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      */
     public function getTitle()
     {
+        $instance = $this->getData('info_instance');
+
+        if ($instance !== null) {
+            $payment = $instance->getAdditionalInformation('moneris_checkout_order_no');
+
+            if ($payment !== null) {
+                return (string)__('Credit Card');
+            }
+        }
+
         return $this->getConfigData('title');
     }
 
@@ -827,11 +842,14 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                 $quoteId = $this->payment->getOrder()->getQuoteId();
 
                 if ($quoteId == $receipt['request']['cart']['quote_id']
-                    //&& $receipt['request']['txn_total'] >= $this->payment->getOrder()->getGrandTotal()
+                    && $receipt['request']['txn_total'] >= $this->payment->getOrder()->getGrandTotal()
                 ) {
-                	  $this->log($receipt);
+                    $this->log($receipt);
                     $this->payment->setAdditionalInformation('moneris_checkout_receipt', $receipt['request']['ticket']);
                     $this->payment->setAdditionalInformation('moneris_checkout_payment_action', $receipt["receipt"]["cc"]["transaction_code"]);
+                    $this->payment->setAdditionalInformation('moneris_checkout_transaction_date_time', $receipt["receipt"]["cc"]["transaction_date_time"]);
+                    $this->payment->setAdditionalInformation('moneris_checkout_transaction_no', $receipt["receipt"]["cc"]["transaction_no"]);
+                    $this->payment->setAdditionalInformation('moneris_checkout_order_no', $receipt["receipt"]["cc"]["order_no"]);
 
                     $this->payment->setAdditionalInformation('receipt_id', $receipt["receipt"]["cc"]["order_no"]);
                     $this->payment->setCcTransId($receipt["receipt"]["cc"]["transaction_no"]);
@@ -849,7 +867,6 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             throw new LocalizedException(__('We cannot process your payment. Please try using another card or call your bank.'));
         }
     }
-
 
     /**
      * Send capture request to gateway
