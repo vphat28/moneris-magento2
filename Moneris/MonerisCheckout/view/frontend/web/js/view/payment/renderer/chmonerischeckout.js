@@ -49,8 +49,21 @@ define(
                 }).done(function (returnData) {
                     // Close payment sheet with success message
                     // self.cartId = returnData.quote_id;
-                    if (typeof returnData !== 'undefined') {
-                    self.myCheckout.startCheckout(returnData.ticket);
+                    if (typeof returnData !== 'undefined' &&
+                        typeof returnData.ticket !== 'undefined' &&
+                        returnData.ticket.length > 0
+                    ) {
+                        self.myCheckout.startCheckout(returnData.ticket);
+                    } else {
+                        var error_msg = '';
+
+                        if (typeof returnData.error !== 'undefined') {
+                            for (var i = 0; i < returnData.error.length; i++) {
+                                error_msg += returnData.error[i].data + '\n';
+                            }
+
+                            alert(error_msg);
+                        }
                     }
                 }).fail(function () {
                     //fullScreenLoader.stopLoader();

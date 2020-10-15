@@ -258,9 +258,16 @@ class Getticket extends Action
                 'user' => $userId,
             ]);
         } else {
+            $error = [];
+
+            if (isset($body["response"]["error"]) && !empty($body["response"]["error"])) {
+                $error = array_values($body["response"]["error"]);
+            }
+
             $result->setData([
                 'success' => false,
-                'body' => $body
+                'body' => $body,
+                'error' => $error,
             ]);
         }
 
