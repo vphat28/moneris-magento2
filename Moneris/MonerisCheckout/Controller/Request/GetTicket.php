@@ -186,6 +186,7 @@ class Getticket extends Action
             }
         }
 
+        if (!$quote->getIsVirtual())
         {
             $requestData->shipping_details              = new \stdClass();
             $requestData->shipping_details->address_1   =  is_array($shipping->getStreet()) ? implode(' ', $shipping->getStreet()) : (string)$shipping->getStreet();
