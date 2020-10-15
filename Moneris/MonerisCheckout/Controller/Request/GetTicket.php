@@ -196,17 +196,18 @@ class Getticket extends Action
             $requestData->shipping_details->postal_code = $shipping->getPostcode();
         }
 
+        $postedData = @json_decode(file_get_contents('php://input'), true);
+        $street = $postedData['billing']['street'];
+
         {
             $requestData->billing_details              = new \stdClass();
-            $requestData->billing_details->address_1   = is_array($billing->getStreet()) ? implode(' ', $billing->getStreet()) : (string)$billing->getStreet();
-            //$requestData->billing_details->address_2   = $billing->get();
-            $requestData->billing_details->city        = $billing->getCity();
-            $requestData->billing_details->province    = $billing->getRegion();
-            $requestData->billing_details->country     = $billing->getCountry();
-            $requestData->billing_details->postal_code = $billing->getPostcode();
+            $requestData->billing_details->address_1   = is_array($street) ? implode(' ', $street) : (string)$street;
+            $requestData->billing_details->city        = $postedData['billing']['city'];
+            $requestData->billing_details->province    = $postedData['billing']['province'];
+            $requestData->billing_details->country     = $postedData['billing']['country'];
+            $requestData->billing_details->postal_code = $postedData['billing']['postcode'];
         }
 
-        $postedData = @json_decode(file_get_contents('php://input'), true);
         $inputedEmail = filter_var($postedData['email'], FILTER_SANITIZE_EMAIL);
 
         $requestData->contact_details = new \stdClass();

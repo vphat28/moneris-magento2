@@ -32,6 +32,17 @@ define(
                 else return window.checkoutConfig.customerData.email;
             },
 
+            getBillingAddress: function () {
+                var billing = quote.billingAddress();
+                return {
+                    postcode: billing.postcode,
+                    street: billing.street,
+                    city: billing.city,
+                    province: billing.region,
+                    country: billing.countryId,
+                }
+            },
+
             placeMonerisOrder: function () {
                 var urlXhr = urlBuilder.build('monerischeckout/request/getticket');
 
@@ -42,7 +53,8 @@ define(
                     url: urlXhr,
                     data: JSON.stringify({
                         "test": "OK",
-                        "email": self.getInputedEmail()
+                        "email": self.getInputedEmail(),
+                        "billing": self.getBillingAddress(),
                     }),
                     type: 'post',
                     contentType: 'application/json'
