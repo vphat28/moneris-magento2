@@ -137,6 +137,9 @@ class Getticket extends Action
         $shippingIcon = $this->assetRepo->getUrlWithParams('Moneris_MonerisCheckout::images/shipping-icon.png', ['_secure' => true]);
         /** @var Quote $quote */
 
+        $postedData = @json_decode(file_get_contents('php://input'), true);
+
+        $inputedEmail = filter_var($postedData['email'], FILTER_SANITIZE_EMAIL);
         $requestData = new \stdClass;
         $requestData->store_id = $this->data->getStoreId();
         $requestData->api_token = $this->data->getApiToken();
@@ -146,7 +149,7 @@ class Getticket extends Action
         $requestData->environment = $this->data->getMode();
         $requestData->action = "preload";
         $requestData->order_no = $quoteId . '_' . time();
-        $requestData->cust_id = $quote->getBillingAddress()->getEmail();
+        $requestData->cust_id = $inputedEmail;
         $requestData->dynamic_descripto = "dyndesc";
         $requestData->cart = new \stdClass;
         $requestData->cart->items = [];
@@ -197,7 +200,6 @@ class Getticket extends Action
             $requestData->shipping_details->postal_code = $shipping->getPostcode();
         }
 
-        $postedData = @json_decode(file_get_contents('php://input'), true);
         $street = $postedData['billing']['street'];
 
         {
@@ -208,8 +210,6 @@ class Getticket extends Action
             $requestData->billing_details->country     = $postedData['billing']['country'];
             $requestData->billing_details->postal_code = $postedData['billing']['postcode'];
         }
-
-        $inputedEmail = filter_var($postedData['email'], FILTER_SANITIZE_EMAIL);
 
         $requestData->contact_details = new \stdClass();
         $requestData->contact_details->first_name = $billing->getFirstname();
