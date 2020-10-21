@@ -255,17 +255,14 @@ class Transaction extends AbstractModel
         $payment = $this->getPayment();
         $methodCode = $payment->getMethodInstance()->getCode();
 
-        $storeId = $this->getHelper()->getConfigData("payment/".$methodCode."/login", true);
+        $storeId = $this->getHelper()->getScopeConfig()->getValue("payment/moneris/".$methodCode."/login");
 
-        if (empty($storeId)) {
-            $storeId = $this->getHelper()->getConfigData("payment/moneris/".$methodCode."/login", true);
-        }
+        $encryptor = $this->getHelper()->getDecryptor();
 
-        $apiToken =  $this->getHelper()->getConfigData("payment/".$methodCode."/password", true);
+        $storeId = $encryptor->decrypt($storeId);
 
-        if (empty($apiToken)) {
-            $apiToken =  $this->getHelper()->getConfigData("payment/moneris/".$methodCode."/password", true);
-        }
+        $apiToken =  $this->getHelper()->getScopeConfig()->getValue("payment/moneris/".$methodCode."/password");
+        $apiToken = $encryptor->decrypt($apiToken);
 
         $this->getHelper()->log(__FILE__." ".__LINE__." store $storeId");
         $this->getHelper()->log(__FILE__." ".__LINE__." api $apiToken");

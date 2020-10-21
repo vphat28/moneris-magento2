@@ -44,7 +44,7 @@ configuration code ECNP-00444.]]></comment>
                             will not be visible to online shoppers.</tooltip>
                     </field>
 
-                    <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="login" translate="label" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Store ID</label>
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                         <tooltip><![CDATA[
@@ -55,7 +55,7 @@ configuration code ECNP-00444.]]></comment>
                         Center</a>.
                             ]]></tooltip>
                     </field>
-                    <field id="password" translate="label" type="obscure" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="password" translate="label" type="obscure" sortOrder="21" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>API Token</label>
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                         <tooltip>
@@ -68,7 +68,7 @@ configuration code ECNP-00444.]]></comment>
                         </tooltip>
                     </field>
 
-                    <field id="moneris_checkout_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="moneris_checkout_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Moneris Checkout ID</label>
                         <tooltip><![CDATA[
                             The Checkout ID is generated when
@@ -80,7 +80,7 @@ configuration code ECNP-00444.]]></comment>
                         </tooltip>
                     </field>
 
-                    <field id="testmode" translate="label" type="select" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="testmode" translate="label" type="select" sortOrder="39" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Test Mode</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <tooltip>Enable Test Mode to conduct test

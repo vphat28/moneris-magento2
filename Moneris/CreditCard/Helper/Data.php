@@ -584,10 +584,20 @@ class Data extends AbstractHelper
         //default return 2 decimal places
         return sprintf('%.2f', $price);
     }
-    
-    public function getConfigData($path, $encrypt = false)
+
+    public function getScopeConfig()
     {
-        $value = $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return $this->scopeConfig;
+    }
+
+    public function getDecryptor()
+    {
+        return $this->encryptor;
+    }
+    
+    public function getConfigData($path, $encrypt = false, $magentoStore = null)
+    {
+        $value = $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $magentoStore);
 
         if (empty($value)) {
             $pathGroup = explode('/', $path);
@@ -601,7 +611,7 @@ class Data extends AbstractHelper
                     $newPathGroup[] = $v;
                 }
             }
-            $value = $this->scopeConfig->getValue(implode('/', $newPathGroup), \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $value = $this->scopeConfig->getValue(implode('/', $newPathGroup), \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $magentoStore);
         }
         $encryptor = ObjectManager::getInstance()->get('Magento\Framework\Encryption\Encryptor');
         if ($encrypt) {
