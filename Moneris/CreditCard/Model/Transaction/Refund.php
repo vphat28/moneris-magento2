@@ -21,6 +21,8 @@ class Refund extends Transaction
     public function buildTransactionArray()
     {
         $payment = $this->getPayment();
+        $order = $payment->getOrder();
+        $custId = $order->getCustomerEmail();
 
         if (!$payment) {
             return [];
@@ -39,6 +41,7 @@ class Refund extends Transaction
         return [
             'type'          => $requestType,
             'order_id'      => $monerisOrderId,
+            'cust_id'       => $custId,
             'amount'        => $this->getAmount(),
             'crypt_type'    => $this->getCryptType() ? $this->getCryptType() : self::CRYPT_FIVE,
             'txn_number'    => $payment->getCcTransId()
