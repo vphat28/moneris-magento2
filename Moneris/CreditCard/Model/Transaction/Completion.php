@@ -22,6 +22,9 @@ class Completion extends Transaction
     {
         $payment = $this->getPayment();
 
+        $order = $payment->getOrder();
+        $custId = $order->getCustomerEmail();
+
         if (!$payment) {
             return [];
         }
@@ -33,6 +36,7 @@ class Completion extends Transaction
         return [
             'type'              => $this->_requestType,
             'order_id'          => $monerisOrderId,
+            'cust_id'       => $custId,
             'comp_amount'       => $this->getAmount(),
             self::CRYPT_FIELD   => $this->getCryptType(),
             'txn_number'        => $payment->getCcTransId()
