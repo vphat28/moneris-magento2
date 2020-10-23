@@ -203,6 +203,8 @@ class Getticket extends Action
         $street = $postedData['billing']['street'];
 
         {
+            $requestData->shipping_details              = new \stdClass();
+
             $requestData->billing_details              = new \stdClass();
             $requestData->billing_details->address_1   = is_array($street) ? implode(' ', $street) : (string)$street;
             $requestData->shipping_details->address_1   = is_array($street) ? implode(' ', $street) : (string)$street;
