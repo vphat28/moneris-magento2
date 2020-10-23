@@ -860,6 +860,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
                     return $this;
                 } else {
+                    $this->log('MCO Failed');
                     throw new LocalizedException(__('Could not proceed your payment. Please try again'));
                 }
             }
