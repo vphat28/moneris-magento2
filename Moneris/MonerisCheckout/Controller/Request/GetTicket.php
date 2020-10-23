@@ -205,10 +205,15 @@ class Getticket extends Action
         {
             $requestData->billing_details              = new \stdClass();
             $requestData->billing_details->address_1   = is_array($street) ? implode(' ', $street) : (string)$street;
+            $requestData->shipping_details->address_1   = is_array($street) ? implode(' ', $street) : (string)$street;
             $requestData->billing_details->city        = $postedData['billing']['city'];
+            $requestData->shipping_details->city        = $postedData['billing']['city'];
             $requestData->billing_details->province    = $postedData['billing']['province'];
+            $requestData->shipping_details->province    = $postedData['billing']['province'];
             $requestData->billing_details->country     = $postedData['billing']['country'];
+            $requestData->shipping_details->country     = $postedData['billing']['country'];
             $requestData->billing_details->postal_code = $postedData['billing']['postcode'];
+            $requestData->shipping_details->postal_code = $postedData['billing']['postcode'];
         }
 
         $requestData->contact_details = new \stdClass();
