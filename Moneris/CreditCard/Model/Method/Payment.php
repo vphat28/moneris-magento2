@@ -842,6 +842,9 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                 $quoteId = $this->payment->getOrder()->getQuoteId();
                 $this->log($receipt);
                 $this->log('total ' . $this->payment->getOrder()->getGrandTotal());
+                $this->log($quoteId == $receipt['request']['cart']['quote_id']);
+                $this->log((float)$receipt['request']['txn_total'] >= (float)$this->payment->getOrder()->getGrandTotal());
+                $this->log($receipt['receipt']['result'] === 'a');
 
                 if ($quoteId == $receipt['request']['cart']['quote_id']
                     && (float)$receipt['request']['txn_total'] >= (float)$this->payment->getOrder()->getGrandTotal()
