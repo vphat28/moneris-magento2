@@ -189,6 +189,8 @@ class Getticket extends Action
             }
         }
 
+
+        $street = $postedData['billing']['street'];
         if (!$quote->getIsVirtual())
         {
             $requestData->shipping_details              = new \stdClass();
@@ -198,24 +200,24 @@ class Getticket extends Action
             $requestData->shipping_details->province    = $shipping->getRegion();
             $requestData->shipping_details->country     = $shipping->getCountry();
             $requestData->shipping_details->postal_code = $shipping->getPostcode();
+        } else {
+            $requestData->shipping_details              = new \stdClass();
+
+            $requestData->shipping_details->address_1   = is_array($street) ? implode(' ', $street) : (string)$street;
+            $requestData->shipping_details->city        = $postedData['billing']['city'];
+            $requestData->shipping_details->province    = $postedData['billing']['province'];
+            $requestData->shipping_details->country     = $postedData['billing']['country'];
+            $requestData->shipping_details->postal_code = $postedData['billing']['postcode'];
         }
 
-        $street = $postedData['billing']['street'];
-
         {
-            $requestData->shipping_details              = new \stdClass();
 
             $requestData->billing_details              = new \stdClass();
             $requestData->billing_details->address_1   = is_array($street) ? implode(' ', $street) : (string)$street;
-            $requestData->shipping_details->address_1   = is_array($street) ? implode(' ', $street) : (string)$street;
             $requestData->billing_details->city        = $postedData['billing']['city'];
-            $requestData->shipping_details->city        = $postedData['billing']['city'];
             $requestData->billing_details->province    = $postedData['billing']['province'];
-            $requestData->shipping_details->province    = $postedData['billing']['province'];
             $requestData->billing_details->country     = $postedData['billing']['country'];
-            $requestData->shipping_details->country     = $postedData['billing']['country'];
             $requestData->billing_details->postal_code = $postedData['billing']['postcode'];
-            $requestData->shipping_details->postal_code = $postedData['billing']['postcode'];
         }
 
         $requestData->contact_details = new \stdClass();
