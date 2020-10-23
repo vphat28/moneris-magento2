@@ -841,6 +841,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                 $receipt = $register->registry('moneris_checkout_receipt');
                 $quoteId = $this->payment->getOrder()->getQuoteId();
                 $this->log($receipt);
+                $this->log('total ' . $this->payment->getOrder()->getGrandTotal());
 
                 if ($quoteId == $receipt['request']['cart']['quote_id']
                     && $receipt['request']['txn_total'] >= $this->payment->getOrder()->getGrandTotal()
