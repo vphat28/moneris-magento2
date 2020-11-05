@@ -46,6 +46,9 @@ class Getticket extends Action
     /** @var \Magento\Framework\View\Asset\Repository */
     protected $assetRepo;
 
+    /** @var \Magento\Framework\Locale\ResolverInterface */
+    protected $localeResolver;
+
     public function __construct(
         Context $context,
         UserContextInterface $userContext,
@@ -56,6 +59,7 @@ class Getticket extends Action
         ProductRepositoryInterface $productRepository,
         \Moneris\CreditCard\Logger\Logger $logger,
         \Magento\Framework\View\Asset\Repository $assetRepo,
+        \Magento\Framework\Locale\ResolverInterface $localeResolver,
         Image $imageHelper
     )
     {
@@ -67,6 +71,7 @@ class Getticket extends Action
         $this->productRepository = $productRepository;
         $this->logger = $logger;
         $this->assetRepo = $assetRepo;
+        $this->localeResolver = $localeResolver;
         $this->imageHelper = $imageHelper;
         parent::__construct($context);
     }
@@ -246,6 +251,12 @@ class Getticket extends Action
         }
 
         $requestData->subtotal = $this->formatPrice($quote->getGrandTotal());
+
+        $locale = $this->localeResolver->getLocale();
+
+        if (is_int(stripos($locale, 'fr')) && stripos($locale, 'fr') >= 0) {
+            $requestData->language = 'fr';
+        }
 
         $this->logger->debug('getting ticket..' . json_encode($requestData));
 
