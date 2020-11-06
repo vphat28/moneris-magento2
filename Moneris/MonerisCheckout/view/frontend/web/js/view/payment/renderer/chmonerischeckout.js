@@ -89,6 +89,8 @@ define(
 
                     if (window.MonerisCheckoutConfig.mode == 'qa') {
                         self.myCheckout.setMode("dev");
+                    } else {
+                        self.myCheckout.setMode("prod");
                     }
 
                     self.myCheckout.setCheckoutDiv("monerisCheckout");
@@ -159,7 +161,12 @@ define(
                 var self = this;
 
                 $('body').append('<div id="monerisCheckout" style="z-index: 9999"></div>');
-                var url = "https://gatewayt.moneris.com/chkt/js/chkt_v1.00.js";
+
+                if ( window.MonerisCheckoutConfig.mode == 'qa' ) {
+                    var url = "https://gatewayt.moneris.com/chkt/js/chkt_v1.00.js";
+                } else {
+                    var url = "https://gateway.moneris.com/chkt/js/chkt_v1.00.js";
+                }
 
                 $.getScript(url, function () {
                     self.configureButton();

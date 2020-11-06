@@ -113,7 +113,7 @@ class Getticket extends Action
      */
     public function execute()
     {
-        $url = self::PREREQUEST_ENDPOINT;
+        $url = $this->data->getEndpoint();
         $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
         /** @var Client $client */

@@ -9,6 +9,9 @@ use GuzzleHttp\ClientFactory;
 class Data implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
     const PREREQUEST_ENDPOINT = 'https://gatewayt.moneris.com/chkt/request/request.php';
+
+    const PREREQUEST_ENDPOINT_PROD = 'https://gateway.moneris.com/chkt/request/request.php';
+
     /** @var ScopeConfigInterface */
     private $scopeConfig;
 
@@ -59,7 +62,16 @@ class Data implements \Magento\Framework\View\Element\Block\ArgumentInterface
 
     public function getEndpoint()
     {
-        return self::PREREQUEST_ENDPOINT;
+        if ($this->getIsTestMode()) {
+            return self::PREREQUEST_ENDPOINT;
+        } else {
+            return self::PREREQUEST_ENDPOINT_PROD;
+        }
+    }
+
+    public function getIsTestMode()
+    {
+        return $this->creditCardHelper->isCCTestMode();
     }
 
     public function getStoreId()
