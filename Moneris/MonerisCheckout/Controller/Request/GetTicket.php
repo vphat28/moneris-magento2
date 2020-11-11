@@ -140,6 +140,8 @@ class Getticket extends Action
         $shippingCost = $shipping->getShippingAmount();
         $billing = $quote->getBillingAddress();
         $shippingIcon = $this->assetRepo->getUrlWithParams('Moneris_MonerisCheckout::images/shipping-icon.png', ['_secure' => true]);
+        $quote->reserveOrderId();
+        $reservedOrderID = $quote->getReservedOrderId();
         /** @var Quote $quote */
 
         $postedData = @json_decode(file_get_contents('php://input'), true);
@@ -154,7 +156,7 @@ class Getticket extends Action
         $requestData->environment = $this->data->getMode();
         $requestData->action = "preload";
         $requestData->order_no = $quoteId . '_' . time();
-        $requestData->cust_id = $inputedEmail;
+        $requestData->cust_id = $reservedOrderID;
         $requestData->dynamic_descripto = "dyndesc";
         $requestData->cart = new \stdClass;
         $requestData->cart->items = [];
