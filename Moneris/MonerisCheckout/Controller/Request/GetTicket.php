@@ -141,6 +141,7 @@ class Getticket extends Action
         $billing = $quote->getBillingAddress();
         $shippingIcon = $this->assetRepo->getUrlWithParams('Moneris_MonerisCheckout::images/shipping-icon.png', ['_secure' => true]);
         $quote->reserveOrderId();
+        $quote->save();
         $reservedOrderID = $quote->getReservedOrderId();
         /** @var Quote $quote */
 
