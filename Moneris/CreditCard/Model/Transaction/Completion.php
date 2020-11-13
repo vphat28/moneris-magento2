@@ -23,7 +23,7 @@ class Completion extends Transaction
         $payment = $this->getPayment();
 
         $order = $payment->getOrder();
-        $custId = $order->getCustomerEmail();
+        $custId = $order->getIncrementId();
 
         if (!$payment) {
             return [];
