@@ -844,6 +844,9 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
             return $this->processTransaction(self::AUTHORIZE);
         } catch (\Exception $exception) {
+            if ($exception->getMessage()) {
+                throw new LocalizedException(__($exception->getMessage()));
+            }
             throw new LocalizedException(__('We cannot process your payment. Please try using another card or call your bank.'));
         }
     }

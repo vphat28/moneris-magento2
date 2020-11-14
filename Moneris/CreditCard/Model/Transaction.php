@@ -710,11 +710,7 @@ class Transaction extends AbstractModel
         $status = 'FAILED';
         $message = $this->getHelper()->getResponseTextOverride('CVD', $status);
         if (!$message) {
-            $message = __(
-                'Card Verification Number mismatch. $1 : $2',
-                $this->cvdResponseCodes[$cvdResultCode[0]],
-                $this->cvdResponseCodes[$cvdResultCode[1]]
-            );
+            $message = __('Card Verification Number mismatch');
         }
 
         $this->_undoTransaction($result);

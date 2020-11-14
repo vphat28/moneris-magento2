@@ -5,6 +5,7 @@
  */
 namespace Moneris\CreditCard\Helper;
 
+use Magento\Store\Model\ScopeInterface;
 use Moneris\CreditCard\Model\ObjectFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\Context;
@@ -426,7 +427,7 @@ class Data extends AbstractHelper
     
     public function getAvsSuccessCodes()
     {
-        $codesString = $this->getModuleConfig('avssuccess');
+        $codesString = $this->getConfigValue('payment/moneris/chmoneriscc/avssuccess', ScopeInterface::SCOPE_WEBSITE);
         $codes = explode(',', $codesString);
         
         foreach ($codes as &$c) {

@@ -106,7 +106,7 @@ abstract class AbstractHelper extends \Magento\Framework\App\Helper\AbstractHelp
 
     public function getConfigPath()
     {
-        return self::CONFIG_PATH . self::MODULE_CODE . '/';
+        return self::CONFIG_PATH . 'moneris/'. self::MODULE_CODE . '/';
     }
 
     public function getModuleConfig($path)
