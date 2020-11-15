@@ -19,6 +19,8 @@ class Getticket extends Action
 {
     const PREREQUEST_ENDPOINT = 'https://gatewayt.moneris.com/chkt/request/request.php';
 
+    const MAX_CUST_ID_FIELD = 50;
+
     /** @var UserContextInterface */
     private $userContext;
 
@@ -233,6 +235,12 @@ class Getticket extends Action
         $requestData->contact_details->last_name = $billing->getLastname();;
         $requestData->contact_details->email = empty($billing->getEmail()) ? $inputedEmail : $billing->getEmail();
         $requestData->contact_details->phone = $billing->getTelephone();
+
+        $requestData->cust_id = substr(
+            $requestData->cust_id . '+'  . $requestData->contact_details->email,
+            0,
+            self::MAX_CUST_ID_FIELD
+        );
 
         $total = (float)$quote->getGrandTotal();
         $tax = $quote->getTotals()['tax'];
