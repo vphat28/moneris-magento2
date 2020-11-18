@@ -37,12 +37,12 @@
                   type="button"
                   data-bind="
                         click: placeMonerisOrder,
-                        attr: {title: $t('Place Order')},
+                        attr: {title: $t('Proceed to Checkout')},
                         enable: (getCode() == isChecked()),
                         css: {disabled: !isPlaceOrderActionAllowed()}
                         "
                   disabled>
-            <span data-bind="text: $t('Place Order')"></span>
+            <span data-bind="text: $t('Proceed to Checkout')"></span>
           </button>
         </div>
       </div>
