@@ -98,4 +98,19 @@ class Data implements \Magento\Framework\View\Element\Block\ArgumentInterface
     {
         return $this->creditCardHelper->isCCTestMode() ? 'qa' : 'live';
     }
+
+    public function getCardTypes()
+    {
+        return [
+            'V' => 'Visa',
+            'M' => 'Mastercard',
+            'AX' => 'American Express',
+            'DC' => 'Diner\'s Card',
+            'NO' => 'Novus/Discover',
+            'SE' => 'Sears',
+            'D' => 'INTERAC® Debit',
+            'C1' => 'JCB',
+        ];
+
+    }
 }

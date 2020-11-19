@@ -851,6 +851,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                 ) {
                     $this->payment->setAdditionalInformation('moneris_checkout_receipt', $receipt['request']['ticket']);
                     $this->payment->setAdditionalInformation('moneris_checkout_payment_action', $receipt["receipt"]["cc"]["transaction_code"]);
+                    $this->payment->setAdditionalInformation('moneris_checkout_card_type', $receipt["receipt"]["cc"]["card_type"]);
                     $this->payment->setAdditionalInformation('moneris_checkout_transaction_date_time', $receipt["receipt"]["cc"]["transaction_date_time"]);
                     $this->payment->setAdditionalInformation('moneris_checkout_transaction_no', $receipt["receipt"]["cc"]["transaction_no"]);
                     $this->payment->setAdditionalInformation('moneris_checkout_order_no', $receipt["receipt"]["cc"]["order_no"]);
