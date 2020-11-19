@@ -191,6 +191,7 @@ class Getticket extends Action
             if (!empty(floatval($shippingCost))) {
                 $itemDataToSend = new \stdClass();
                 $itemDataToSend->description = (string)__('Shipping cost');
+                $itemDataToSend->product_code = 'NONE';
                 $itemDataToSend->unit_cost = $this->formatPrice($shippingCost);
                 $itemDataToSend->quantity = 1;
                 $itemDataToSend->url = $shippingIcon;
