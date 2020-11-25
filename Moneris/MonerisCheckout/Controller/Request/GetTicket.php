@@ -19,7 +19,7 @@ class Getticket extends Action
 {
     const PREREQUEST_ENDPOINT = 'https://gatewayt.moneris.com/chkt/request/request.php';
 
-    const MAX_CUST_ID_FIELD = 50;
+    const MAX_CUST_ID_FIELD = 31;
 
     /** @var UserContextInterface */
     private $userContext;
@@ -180,8 +180,8 @@ class Getticket extends Action
                 }
 
 
-                $itemDataToSend->description = $product->getName();
-                $itemDataToSend->product_code = $product->getSku();
+                $itemDataToSend->description = $this->stripBadCharacters($product->getName());
+                $itemDataToSend->product_code = $this->stripBadCharacters($product->getSku());
                 $itemDataToSend->unit_cost = $this->formatPrice($item->getPrice());
                 $itemDataToSend->quantity = $item->getQty();
 
@@ -306,5 +306,12 @@ class Getticket extends Action
         }
 
         return $result;
+    }
+
+    protected function stripBadCharacters($str)
+    {
+        $str = preg_replace('/[\\\<\>\$\%\=\?\^\{\}\[\]]/', '', $str);
+
+        return $str;
     }
 }
