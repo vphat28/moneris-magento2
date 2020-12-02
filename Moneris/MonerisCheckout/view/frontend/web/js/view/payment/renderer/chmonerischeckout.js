@@ -9,9 +9,11 @@ define(
         'jquery',
         'Magento_Checkout/js/view/payment/default',
         'mage/url',
-        'Magento_Checkout/js/model/quote'
+        'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/model/payment/additional-validators',
+        'Magento_Checkout/js/action/redirect-on-success'
     ],
-    function (ko, $, Component, urlBuilder, quote) {
+    function (ko, $, Component, urlBuilder, quote, additionalValidators, redirectOnSuccessAction) {
         'use strict';
         var config = window.checkoutConfig.payment.chmonerischeckout;
 
@@ -110,7 +112,7 @@ define(
 
                     function myPaymentComplete(data) {
                         data = JSON.parse(data);
-                        console.log(data);
+                        console.log('Completing transaction');
 
                         if (self.showReceipt === true) {
                             if (!self.processedOrder) {
@@ -124,15 +126,13 @@ define(
                     }
 
                     function myPaymentReceipt(data) {
+                        console.log('Got receipt for transaction');
+
                         self.showReceipt = true;
                         data = JSON.parse(data);
-                        console.log(data);
 
                         if (data.response_code === '001') {
-                            setTimeout(
-                                function () {
-                                    self.chargeRequest(data.ticket);
-                                }, 7500);
+                            self.chargeRequest(data.ticket);
                         } else {
                             alert('Transaction error. Please try again');
                             self.myCheckout.closeCheckout();
@@ -150,8 +150,46 @@ define(
                 });
             },
 
+            /**
+             * @override
+             */
+            placeOrder: function (data, event) {
+                var self = this;
+
+                if (event) {
+                    event.preventDefault();
+                }
+
+                if (this.validate() && additionalValidators.validate()) {
+                    this.isPlaceOrderActionAllowed(false);
+
+                    this.getPlaceOrderDeferredObject()
+                        .fail(
+                            function () {
+                                self.isPlaceOrderActionAllowed(true);
+                            }
+                        ).done(
+                        function () {
+                            if (self.redirectAfterPlaceOrder) {
+                                setTimeout(
+                                    function () {
+                                        self.myCheckout.closeCheckout();
+                                        redirectOnSuccessAction.execute();
+                                    }, 7500);
+                            } else {
+                                self.afterPlaceOrder();
+                            }
+                        }
+                    );
+
+                    return true;
+                }
+
+                return false;
+            },
+
             chargeRequest: function (ticket) {
-                this.myCheckout.closeCheckout();
+                //this.myCheckout.closeCheckout();
                 this.monerisTicket = ticket;
                 this.processedOrder = true;
                 this.placeOrder();

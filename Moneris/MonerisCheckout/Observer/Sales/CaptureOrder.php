@@ -6,6 +6,7 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Moneris\MonerisCheckout\Helper\Data;
 
 class CaptureOrder implements ObserverInterface
 {
@@ -15,13 +16,18 @@ class CaptureOrder implements ObserverInterface
     /** @var OrderRepositoryInterface */
     protected $orderRepository;
 
+    /** @var Data */
+    protected $data;
+
     public function __construct(
         \Magento\Sales\Api\InvoiceManagementInterface $invoiceManagement,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        Data $data
     )
     {
         $this->invoiceManagement = $invoiceManagement;
         $this->orderRepository = $orderRepository;
+        $this->data = $data;
     }
 
     public function execute( Observer $observer ) {
@@ -34,8 +40,6 @@ class CaptureOrder implements ObserverInterface
 		    // make an invoice
             $this->makeInvoice($order);
         }
-
-	    // TODO: Implement execute() method.
 	}
 
 	protected function makeInvoice($order)
@@ -52,8 +56,11 @@ class CaptureOrder implements ObserverInterface
 
         $message = 'Captured amount of %1.';
         $message = __($message, $amount);
-        $order->setState(Order::STATE_PROCESSING);
-        $order->setStatus(Order::STATE_PROCESSING);
+
+        $orderStatus = empty($this->data->getOrderStatus()) ? Order::STATE_PROCESSING : $this->data->getOrderStatus();
+
+        $order->setState($orderStatus);
+        $order->setStatus($orderStatus);
         $transaction = $payment->getCcTransId();
         $payment->addTransactionCommentsToOrder($transaction, $message);
         $payment->setIsTransactionClosed(false);

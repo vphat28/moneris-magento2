@@ -94,6 +94,11 @@ class Data implements \Magento\Framework\View\Element\Block\ArgumentInterface
         return (bool)$this->scopeConfig->isSetFlag('payment/moneris/chmoneriscc/active');
     }
 
+    public function getOrderStatus()
+    {
+        return $this->scopeConfig->getValue('payment/moneris/chmoneriscc/order_status');
+    }
+
     public function getMode()
     {
         return $this->creditCardHelper->isCCTestMode() ? 'qa' : 'live';
