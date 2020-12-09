@@ -22,7 +22,7 @@ website with Moneris Checkout.
 Don’t have an account with Moneris
 yet? It’s easy to get started. Call
 Moneris at 1-855-232-2365 and mention
-configuration code ECNP-00444.]]></comment>
+configuration code ECNP-00494.]]></comment>
                 <group id="chmoneriscc" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1" >
                     <label>Moneris Checkout account details</label>
                     <comment><![CDATA[Login to the <a href='https://www3.moneris.com/mpg/'>Moneris Merchant Resource

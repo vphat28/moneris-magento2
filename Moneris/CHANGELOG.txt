@@ -1,0 +1,3 @@
+December 02 2020: Create Magento order right after receiving Moneris Receipt
+December 02 2020: Use configured order status for captured transactions
+December 08 2020: Update config code to ECNP-00494
