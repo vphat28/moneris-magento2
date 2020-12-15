@@ -19,14 +19,19 @@ class CaptureOrder implements ObserverInterface
     /** @var Data */
     protected $data;
 
+    /** @var \Magento\Sales\Model\Order\Status */
+    protected $statusFactory;
+
     public function __construct(
         \Magento\Sales\Api\InvoiceManagementInterface $invoiceManagement,
         OrderRepositoryInterface $orderRepository,
+        \Magento\Sales\Model\Order\StatusFactory $statusFactory,
         Data $data
     )
     {
         $this->invoiceManagement = $invoiceManagement;
         $this->orderRepository = $orderRepository;
+        $this->statusFactory = $statusFactory;
         $this->data = $data;
     }
 
@@ -59,7 +64,12 @@ class CaptureOrder implements ObserverInterface
 
         $orderStatus = empty($this->data->getOrderStatus()) ? Order::STATE_PROCESSING : $this->data->getOrderStatus();
 
-        $order->setState($orderStatus);
+        /** @var \Magento\Sales\Model\Order\Status $status */
+        $status = $this->statusFactory->create();
+        $status = $status->load($orderStatus, 'status');
+
+
+        $order->setState($status->getData('state'));
         $order->setStatus($orderStatus);
         $transaction = $payment->getCcTransId();
         $payment->addTransactionCommentsToOrder($transaction, $message);
