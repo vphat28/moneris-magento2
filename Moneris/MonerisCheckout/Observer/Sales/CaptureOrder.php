@@ -26,12 +26,14 @@ class CaptureOrder implements ObserverInterface
         \Magento\Sales\Api\InvoiceManagementInterface $invoiceManagement,
         OrderRepositoryInterface $orderRepository,
         \Magento\Sales\Model\Order\StatusFactory $statusFactory,
+        \Magento\Sales\Model\ResourceModel\Status\CollectionFactory $statusCollectionFactory,
         Data $data
     )
     {
         $this->invoiceManagement = $invoiceManagement;
         $this->orderRepository = $orderRepository;
         $this->statusFactory = $statusFactory;
+        $this->statusCollectionFactory = $statusCollectionFactory;
         $this->data = $data;
     }
 
@@ -63,13 +65,18 @@ class CaptureOrder implements ObserverInterface
         $message = __($message, $amount);
 
         $orderStatus = empty($this->data->getOrderStatus()) ? Order::STATE_PROCESSING : $this->data->getOrderStatus();
+        $state = Order::STATE_PROCESSING;
+        /** @var \Magento\Sales\Model\ResourceModel\Status\Collection $statuses */
+        $statuses = $this->statusCollectionFactory->create();
+        $allStatuses = $statuses->getItems();
 
-        /** @var \Magento\Sales\Model\Order\Status $status */
-        $status = $this->statusFactory->create();
-        $status = $status->load($orderStatus, 'status');
+        foreach ($allStatuses as $st) {
+            if ($st->getData('status') == $orderStatus) {
+                $state = $st->getData('state');
+            }
+        }
 
-
-        $order->setState($status->getData('state'));
+        $order->setState($state);
         $order->setStatus($orderStatus);
         $transaction = $payment->getCcTransId();
         $payment->addTransactionCommentsToOrder($transaction, $message);
