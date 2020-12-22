@@ -1,14 +1,14 @@
 {
-    "name": "collinsharper/module-moneris",
+    "name": "moneris/module-creditcard",
     "description": "The Collins Harper Moneris module extends base magento for payments through the Moneris Gateway. Please read about our Boxing module on collinsharper.com.",
     "require": {
-        "php": "~5.5.0|~5.6.0|~7.0.0",
+        "php": "~7.1|~7.2|~7.3",
         "magento/module-checkout": "100.*|101.*",
         "magento/module-payment": "100.*|101.*",
         "lib-libxml": "*"
     },
     "type": "magento2-module",
-    "version": "1.0.0",
+    "version": "3.0.2",
     "license": [
         "CH-1.0"
     ],
