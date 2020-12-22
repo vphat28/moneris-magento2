@@ -12,6 +12,13 @@ use Moneris\CreditCard\Model\Method\Payment;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Session\SessionManagerInterface;
+use Moneris\CreditCard\SDK\mpgAvsInfo;
+use Moneris\CreditCard\SDK\mpgCustInfo;
+use Moneris\CreditCard\SDK\mpgCvdInfo;
+use Moneris\CreditCard\SDK\mpgHttpsPost;
+use Moneris\CreditCard\SDK\mpgHttpsPostStatus;
+use Moneris\CreditCard\SDK\mpgRequest;
+use Moneris\CreditCard\SDK\mpgTransaction;
 
 /**
  * Moneres OnSite Payment Method model.
@@ -217,7 +224,7 @@ class Transaction extends AbstractModel
      */
     public function buildMpgTransaction($txnArray)
     {
-        return new \mpgTransaction($txnArray);
+        return new mpgTransaction($txnArray);
     }
 
     /**
@@ -229,7 +236,7 @@ class Transaction extends AbstractModel
     public function buildMpgRequest($mpgTxn)
     {
         
-        $mpgRequest = new \mpgRequest($mpgTxn);
+        $mpgRequest = new mpgRequest($mpgTxn);
         
         $mpgRequest->setProcCountryCode("CA");
         if ($this->getHelper()->isUsApi()) {
@@ -267,7 +274,7 @@ class Transaction extends AbstractModel
         $this->getHelper()->log(__FILE__." ".__LINE__." store $storeId");
         $this->getHelper()->log(__FILE__." ".__LINE__." api $apiToken");
 
-        $mpgHttpPost = new \mpgHttpsPost($storeId, $apiToken, $mpgRequest);
+        $mpgHttpPost = new mpgHttpsPost($storeId, $apiToken, $mpgRequest);
         return $mpgHttpPost;
     }
 
@@ -296,7 +303,7 @@ class Transaction extends AbstractModel
         $this->getHelper()->log(__FILE__." ".__LINE__." store $storeId");
         $this->getHelper()->log(__FILE__." ".__LINE__." api $apiToken");
 
-        $mpgHttpPost = new \mpgHttpsPostStatus($storeId, $apiToken, 'true', $mpgRequest);
+        $mpgHttpPost = new mpgHttpsPostStatus($storeId, $apiToken, 'true', $mpgRequest);
         return $mpgHttpPost;
     }
 
@@ -737,7 +744,7 @@ class Transaction extends AbstractModel
             $shipping = $this->objToArray($shippingObj);
         }
 
-        $mpgCustInfo = new \mpgCustInfo();
+        $mpgCustInfo = new mpgCustInfo();
 
         $shippingCost = $order->getShippingAmount();
         if ($shippingCost) {
@@ -793,7 +800,7 @@ class Transaction extends AbstractModel
             'avs_zipcode' => $address->getPostcode()
         ];
 
-        $mpgAvsInfo = new \mpgAvsInfo($avs);
+        $mpgAvsInfo = new mpgAvsInfo($avs);
 
         return $mpgAvsInfo;
     }
@@ -815,7 +822,7 @@ class Transaction extends AbstractModel
         ];
         $this->helper->log('CVD sent');
         
-        $mpgCvdInfo = new \mpgCvdInfo($cvv);
+        $mpgCvdInfo = new mpgCvdInfo($cvv);
         
         return $mpgCvdInfo;
     }

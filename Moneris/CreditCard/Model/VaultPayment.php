@@ -9,6 +9,8 @@ use Moneris\CreditCard\Model\AbstractModel;
 use Magento\Framework\DataObject;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\Session\SessionManagerInterface;
+use Moneris\CreditCard\SDK\mpgRequest;
+use Moneris\CreditCard\SDK\mpgTransaction;
 
 /**
  * Moneres OnSite Payment Method model.
@@ -182,8 +184,8 @@ class VaultPayment extends AbstractModel
         $storeId = $this->getHelper()->getConfigData("payment/".$methodCode."/login", true);
         $apiToken =  $this->getHelper()->getConfigData("payment/".$methodCode."/password", true);
 
-        $mpgTxn = new \mpgTransaction($txnArray);
-        $mpgRequest = new \mpgRequest($mpgTxn);
+        $mpgTxn = new mpgTransaction($txnArray);
+        $mpgRequest = new mpgRequest($mpgTxn);
 
         $mpgRequest->setProcCountryCode("CA");
         if ($this->getHelper()->isUsApi()) {
@@ -194,7 +196,7 @@ class VaultPayment extends AbstractModel
             $mpgRequest->setTestMode(true); //false or comment out this line for production transactions
         }
         
-        $mpgHttpPost = new \mpgHttpsPost($storeId, $apiToken, $mpgRequest);
+        $mpgHttpPost = new mpgHttpsPost($storeId, $apiToken, $mpgRequest);
         $mpgResponse = $mpgHttpPost->getMpgResponse();
         return $mpgResponse;
     }

@@ -9,6 +9,7 @@ use Moneris\CreditCard\Model\Transaction;
 use Magento\Framework\DataObject;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\Session\SessionManagerInterface;
+use Moneris\CreditCard\SDK\mpgHttpsPost;
 
 class VaultSaveService extends Transaction
 {
@@ -277,7 +278,7 @@ class VaultSaveService extends Transaction
         $apiToken =  $this->getHelper()->getConfigData("payment/".$methodCode."/password", true);
     
         $this->getHelper()->log(__FILE__." ".__LINE__." store $storeId");
-        $mpgHttpPost = new \mpgHttpsPost($storeId, $apiToken, $mpgRequest);
+        $mpgHttpPost = new mpgHttpsPost($storeId, $apiToken, $mpgRequest);
         return $mpgHttpPost;
     }
 }

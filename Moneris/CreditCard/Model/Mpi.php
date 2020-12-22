@@ -7,6 +7,8 @@ namespace Moneris\CreditCard\Model;
 
 use Moneris\CreditCard\Model\AbstractModel;
 use Magento\Framework\DataObject;
+use Moneris\CreditCard\SDK\mpgRequest;
+use Moneris\CreditCard\SDK\mpgTransaction;
 
 /**
  * Moneres OnSite Payment Method model.
@@ -33,8 +35,8 @@ class Mpi extends AbstractModel
         $storeId = $this->getHelper()->getConfigData("payment/".$methodCode."/login", true);
         $apiToken =  $this->getHelper()->getConfigData("payment/".$methodCode."/password", true);
         
-        $mpgTxn = new \mpgTransaction($txnArray);
-        $mpgRequest = new \mpgRequest($mpgTxn);
+        $mpgTxn = new mpgTransaction($txnArray);
+        $mpgRequest = new mpgRequest($mpgTxn);
         
         $mpgRequest->setProcCountryCode("CA");
         if ($this->getHelper()->isUsApi()) {
@@ -45,7 +47,7 @@ class Mpi extends AbstractModel
             $mpgRequest->setTestMode(true); //false or comment out this line for production transactions
         }
         
-        $mpiHttpsPost = new \mpgHttpsPost($storeId, $apiToken, $mpgRequest);
+        $mpiHttpsPost = new mpgHttpsPost($storeId, $apiToken, $mpgRequest);
         $mpiResponse = $mpiHttpsPost->getMpgResponse();
 
         return $mpiResponse;
