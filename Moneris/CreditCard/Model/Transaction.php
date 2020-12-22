@@ -428,7 +428,7 @@ class Transaction extends AbstractModel
         $rawData = $result->getData('raw_data');
 
         if ($payment->getAdditionalInformation('vault_id_issuer')) {
-            if (@$rawData['IssuerId']) {
+            if (isset($rawData['IssuerId']) && $rawData['IssuerId']) {
                 /** @var Vault $vault */
                 $vault = ObjectManager::getInstance()->create(Vault::class);
                 $vault->load($payment->getAdditionalInformation('vault_id_issuer'));

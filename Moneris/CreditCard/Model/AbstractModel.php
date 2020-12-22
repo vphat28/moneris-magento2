@@ -135,12 +135,6 @@ abstract class AbstractModel extends \Magento\Framework\Model\AbstractModel
         $this->customerSession = $customerSession;
         $this->encryptor = $encryptor;
         $this->countryFactory = $countryFactory;
-        if (!class_exists('Moneris_MpgTransaction')) {
-            $files = glob(BP .  '/lib/Moneris*/*.php');
-            foreach ($files as $f) {
-                require_once $f;
-            }
-        }
 
         parent::__construct(
             $context,

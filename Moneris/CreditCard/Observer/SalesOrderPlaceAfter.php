@@ -56,19 +56,26 @@ class SalesOrderPlaceAfter implements ObserverInterface
         $additionalInfo = $order->getPayment()->getAdditionalInformation();
 
         if (!empty($additionalInfo)) {
-            if (!empty(@$additionalInfo['recurring']) && !empty(@$additionalInfo['data_key'])) {
+            if (
+            	isset($additionalInfo['recurring'])
+            	&& !empty($additionalInfo['recurring'])
+	            && isset($additionalInfo['data_key'])
+                && !empty($additionalInfo['data_key'])) {
                 /** @var RecurringPayment $recurringPayment */
                 $recurringPayment = $this->recurringPaymentFactory->create();
+                if (!isset($additionalInfo['recurringTerm'])) {
+	                $additionalInfo['recurringTerm'] = null;
+                }
                 $recurringPayment->setData('created_date', gmdate("Y-m-d\TH:i:s\Z"));
                 $recurringPayment->setData('last_payment_date', gmdate("Y-m-d\TH:i:s\Z"));
-                $nextPaymentDate = $this->data->convertTermToTime(@$additionalInfo['recurringTerm']);
+                $nextPaymentDate = $this->data->convertTermToTime($additionalInfo['recurringTerm']);
 
                 if ($this->data->isCCTestMode()) {
                     $recurringPayment->setData('next_payment_date', gmdate("Y-m-d\TH:i:s\Z"));
                 } else {
                     $recurringPayment->setData('next_payment_date', gmdate("Y-m-d\TH:i:s\Z", time() + $nextPaymentDate));
                 }
-                $recurringPayment->setData('recurring_term', @$additionalInfo['recurringTerm']);
+                $recurringPayment->setData('recurring_term', $additionalInfo['recurringTerm']);
                 $recurringPayment->setData('customer_id', $order->getCustomerId());
                 $recurringPayment->setData('order_id', $order->getIncrementId());
                 $recurringPayment->setData('amount', $order->getBaseGrandTotal());
