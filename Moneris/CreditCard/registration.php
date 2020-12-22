@@ -1,5 +1,5 @@
 <?php
-
+// @codingStandardsIgnoreStart
 \Magento\Framework\Component\ComponentRegistrar::register(
     \Magento\Framework\Component\ComponentRegistrar::MODULE,
     'Moneris_CreditCard',
@@ -56,8 +56,7 @@ class httpsPost
 
         if($this->debug == true)
         {
-            echo "DataToSend= ".$this->dataToSend;
-            echo "\n\nPostURL= " . $this->url;
+
         }
 
         $g=new mpgGlobals();
@@ -85,7 +84,7 @@ class httpsPost
 
         if($this->debug == true)
         {
-            echo "\n\nRESPONSE= $this->response\n";
+
         }
     }
 
