@@ -23,6 +23,7 @@ class Completion extends Transaction
         $payment = $this->getPayment();
 
         $order = $payment->getOrder();
+        $currencyCode = $order->getOrderCurrencyCode();
         $custId = $order->getIncrementId();
 
         if (!$payment) {
@@ -38,6 +39,8 @@ class Completion extends Transaction
             'order_id'          => $monerisOrderId,
             'cust_id'       => $custId,
             'comp_amount'       => $this->getAmount(),
+            'mcp_version'   => Transaction::MCP_VERSION,
+            'cardholder_currency_code' => $this->getIso4217Code($currencyCode),
             self::CRYPT_FIELD   => $this->getCryptType(),
             'txn_number'        => $payment->getCcTransId()
         ];

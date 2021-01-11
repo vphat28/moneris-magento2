@@ -22,6 +22,7 @@ class Refund extends Transaction
     {
         $payment = $this->getPayment();
         $order = $payment->getOrder();
+        $currencyCode = $order->getOrderCurrencyCode();
         $custId = $order->getIncrementId();
 
         if (!$payment) {
@@ -42,6 +43,9 @@ class Refund extends Transaction
             'type'          => $requestType,
             'order_id'      => $monerisOrderId,
             'cust_id'       => $custId,
+            'mcp_version'   => Transaction::MCP_VERSION,
+            'cardholder_amount' => $this->getAmount(),
+            'cardholder_currency_code' => $this->getIso4217Code($currencyCode),
             'amount'        => $this->getAmount(),
             'crypt_type'    => $this->getCryptType() ? $this->getCryptType() : self::CRYPT_FIVE,
             'txn_number'    => $payment->getCcTransId()

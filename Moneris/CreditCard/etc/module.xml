@@ -6,6 +6,6 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Moneris_CreditCard" setup_version="3.0.2">
+    <module name="Moneris_CreditCard" setup_version="3.0.6">
     </module>
 </config>

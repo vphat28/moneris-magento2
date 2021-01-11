@@ -147,7 +147,7 @@ class Getticket extends Action
         $reservedOrderID = $quote->getReservedOrderId();
         /** @var Quote $quote */
 
-        $postedData = @json_decode(file_get_contents('php://input'), true);
+        $postedData = json_decode(file_get_contents('php://input'), true);
 
         $inputedEmail = filter_var($postedData['email'], FILTER_SANITIZE_EMAIL);
         $requestData = new \stdClass;
@@ -266,7 +266,7 @@ class Getticket extends Action
 
         $locale = $this->localeResolver->getLocale();
 
-        if (is_int(stripos($locale, 'fr')) && stripos($locale, 'fr') >= 0) {
+        if (str_contains($locale, 'fr')) {
             $requestData->language = 'fr';
         }
 
