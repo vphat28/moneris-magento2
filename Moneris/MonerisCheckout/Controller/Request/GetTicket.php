@@ -266,7 +266,7 @@ class Getticket extends Action
 
         $locale = $this->localeResolver->getLocale();
 
-        if (str_contains($locale, 'fr')) {
+        if (strpos($locale, 'fr') !== false) {
             $requestData->language = 'fr';
         }
 

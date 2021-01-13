@@ -5,6 +5,7 @@ namespace Moneris\MonerisCheckout\Helper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientFactory;
+use Magento\Store\Model\ScopeInterface;
 
 class Data implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
@@ -91,7 +92,7 @@ class Data implements \Magento\Framework\View\Element\Block\ArgumentInterface
 
     public function isActive()
     {
-        return (bool)$this->scopeConfig->isSetFlag('payment/moneris/chmoneriscc/active');
+        return (bool)$this->scopeConfig->isSetFlag('payment/moneris/chmoneriscc/active', ScopeInterface::SCOPE_WEBSITE);
     }
 
     public function getOrderStatus()

@@ -19,7 +19,7 @@ define(
 
         return Component.extend({
             isActive: function () {
-                return true;
+                return window.MonerisCheckoutConfig.enable;
             },
             monerisTicket: null,
             processedOrder: false,
