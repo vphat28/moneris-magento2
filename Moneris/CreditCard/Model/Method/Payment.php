@@ -3,6 +3,7 @@
  * Copyright © 2016 CollinsHarper. All rights reserved.
  * See LICENSE.txt for license details.
  */
+
 namespace Moneris\CreditCard\Model\Method;
 
 use Magento\Framework\Exception\LocalizedException;
@@ -18,6 +19,7 @@ use Magento\Payment\Model\Method\TransparentInterface;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order as OrderModel;
 use Magento\Store\Model\ScopeInterface;
+use Moneris\CreditCard\SDK;
 
 /**
  * Moneres OnSite Payment Method model.
@@ -39,7 +41,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
     const PAYMENT_ACTION_CAPTURE = 'authorize_capture';
     const PAYMENT_ACTION_AUTH = 'authorize';
     const PAYMENT_PURCHASE = 'authorize';
-    const  REQUEST_METHOD_CC = 'CC' ;
+    const  REQUEST_METHOD_CC = 'CC';
     const  REQUEST_METHOD_ECHECK = 'ECHECK';
     const  REQUEST_TYPE_AUTH_CAPTURE = 'AUTH_CAPTURE';
     const  REQUEST_TYPE_AUTH_ONLY = 'AUTH_ONLY';
@@ -49,7 +51,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
     const GATEWAY_ACTIONS_LOCKED_STATE_KEY = 'is_gateway_actions_locked';
 
     const VBV_REQUIRED_DECLINE = "Credit card not allow";
-    
+
     const CAVV_FIELD = 'cavv';
     const TRANS_STATUS = 'trans_status';
 
@@ -82,8 +84,8 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * @var bool
      */
     protected $_canCapture = true;
-    
-    protected $_canCapturePartial           = true;
+
+    protected $_canCapturePartial = true;
 
     /**
      * Payment Method feature
@@ -228,31 +230,31 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
     ) {
         parent::__construct(
             $context,
-                $registry,
-                $requestFactory,
-                $extensionFactory,
-                $responseFactory,
-                $customAttributeFactory,
-                $paymentData,
-                $scopeConfig,
-                $logger,
-                $moduleList,
-                $localeDate,
-                $dataHelper,
-                $orderFactory,
-                $invoiceService,
-                $transaction,
-                $storeManager,
-                $quoteRepository,
-                $orderSender,
-                $transactionRepository,
-                $resource,
-                $resourceCollection,
-                $data
+            $registry,
+            $requestFactory,
+            $extensionFactory,
+            $responseFactory,
+            $customAttributeFactory,
+            $paymentData,
+            $scopeConfig,
+            $logger,
+            $moduleList,
+            $localeDate,
+            $dataHelper,
+            $orderFactory,
+            $invoiceService,
+            $transaction,
+            $storeManager,
+            $quoteRepository,
+            $orderSender,
+            $transactionRepository,
+            $resource,
+            $resourceCollection,
+            $data
         );
-        $this->status = $status;
-        $this->psrLogger = $context->getLogger();
-        $this->orderModel = $orderModel;
+        $this->status          = $status;
+        $this->psrLogger       = $context->getLogger();
+        $this->orderModel      = $orderModel;
         $this->responseFactory = $responseFactory;
     }
 
@@ -281,12 +283,12 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         if ($x instanceof \Magento\Framework\DataObject) {
             $x = $x->getData();
         }
-        
-        $content = __CLASS__ . ($lineNumber ? ":{$lineNumber}" : '') . " " .  print_r($x, true);
-	    file_put_contents(BP . '/var/log/ch_moneris.log', PHP_EOL . $content, FILE_APPEND);
+
+        $content = __CLASS__ . ($lineNumber ? ":{$lineNumber}" : '') . " " . print_r($x, true);
+        file_put_contents(BP . '/var/log/ch_moneris.log', PHP_EOL . $content, FILE_APPEND);
 
 
-	    return $this;
+        return $this;
     }
 
     public function getHelper()
@@ -296,45 +298,47 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
     public function getIsVbvEnabled()
     {
-        $payment = $this->payment;
+        $payment    = $this->payment;
         $methodCode = $payment->getMethodInstance()->getCode();
         if ($payment && $methodCode) {
-            return $this->getHelper()->getConfigData("payment/".$methodCode."/vbv_enabled");
+            return $this->getHelper()->getConfigData("payment/" . $methodCode . "/vbv_enabled");
         }
-        
+
         return $this->getHelper()->getIsVbvEnabled();
     }
-    
+
 
     public function getIsVbvRequired()
     {
-        $payment = $this->payment;
+        $payment    = $this->payment;
         $methodCode = $payment->getMethodInstance()->getCode();
         if ($payment && $methodCode) {
-            return $this->getHelper()->getConfigData("payment/".$methodCode."/require_vbv");
+            return $this->getHelper()->getConfigData("payment/" . $methodCode . "/require_vbv");
         }
-        
+
         return $this->getHelper()->getIsVbvRequired();
     }
 
     public function getIsVbvCompatible(\Magento\Framework\DataObject $payment)
     {
         $ccType = $payment->getCcType();
+
         return in_array($ccType, $this->_vbvCcTypes);
     }
 
     public function isPurchase()
     {
         $action = $this->getHelper()->getPaymentAction();
+
         return $action != self::AUTHORIZE && $action != self::CAPTURE;
     }
 
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-        if (!$this->getConfigData('login') || !$this->getConfigData('password')) {
-             return false;
+        if ( ! $this->getConfigData('login') || ! $this->getConfigData('password')) {
+            return false;
         }
-        
+
         return parent::isAvailable($quote);
     }
 
@@ -345,20 +349,22 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
     protected function _getFormattedAmount($amount)
     {
-        return number_format($this->getAlternateCurrencyAdjustedAmount($this->getHelper()->getObject('Magento\Framework\Locale\FormatInterface')->getNumber($amount)), 2, '.', '');
+        return number_format($this->getAlternateCurrencyAdjustedAmount($this->getHelper()->getObject('Magento\Framework\Locale\FormatInterface')->getNumber($amount)),
+            2, '.', '');
     }
 
     public function getAlternateCurrencyAdjustedAmount($amount, $payment = false)
     {
-        if (!$payment) {
+        if ( ! $payment) {
             $payment = $this->payment;
         }
 
         if ($this->getHelper()->isAlternateCurrency()) {
             $difference = $payment->getOrder()->getGrandTotal() / $payment->getOrder()->getBaseGrandTotal();
+
             return round($amount * $difference, 2);
         }
-        
+
         return $amount;
     }
 
@@ -367,39 +373,40 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Checks if VBV is enabled in the config first.
      * Returns false if the payment needs to be VBV/3DS authenticated.
      *
-     * @param \Magento\Framework\DataObject $payment, float $amount
+     * @param \Magento\Framework\DataObject $payment , float $amount
+     *
      * @return string $cryptType if txn should proceed immediately, else false
      */
     public function fetchCryptType(\Magento\Framework\DataObject $payment, $amount)
     {
-        if (!$this->getHelper()->getIsFrontend()) {
+        if ( ! $this->getHelper()->getIsFrontend()) {
             return Transaction::CRYPT_SEVEN;
         }
-        
-        if (!$this->getIsVbvEnabled() || !$this->getIsVbvCompatible($payment)) {
+
+        if ( ! $this->getIsVbvEnabled() || ! $this->getIsVbvCompatible($payment)) {
             return Transaction::CRYPT_SEVEN;
         }
-        
+
         if ($this->getIsVbvEnabled()
             && $payment->getAdditionalInformation(self::TRANS_STATUS)
             && $payment->getAdditionalInformation(self::TRANS_STATUS) == MonerisConstants::CRYPT_RESP_U
         ) {
             return Transaction::CRYPT_SEVEN;
         }
-        
-        $this->getHelper()->log(__FILE__." ".__LINE__." Process  cryptType:");
-        if ($payment->getAdditionalInformation('vault_id') && !$payment->getCcNumber()) {
+
+        $this->getHelper()->log(__FILE__ . " " . __LINE__ . " Process  cryptType:");
+        if ($payment->getAdditionalInformation('vault_id') && ! $payment->getCcNumber()) {
             $this->getHelper()->getCheckoutSession()->setMonerisccVaultId($payment->getAdditionalInformation('vault_id'));
             $cryptType = $this->getHelper()->getObject('Moneris\CreditCard\Model\VaultPayment')
-            ->setPayment($payment)
-            ->setAmount($amount)
-            ->fetchCryptType();
+                              ->setPayment($payment)
+                              ->setAmount($amount)
+                              ->fetchCryptType();
         } else {
             $this->log(__METHOD__ . 'vbv ');
             $cryptType = $this->getHelper()->getObject('Moneris\CreditCard\Model\Mpi\Txn')
-                ->setPayment($payment)
-                ->setAmount($amount)
-                ->fetchCryptType();
+                              ->setPayment($payment)
+                              ->setAmount($amount)
+                              ->fetchCryptType();
         }
 
         switch ($cryptType) {
@@ -407,6 +414,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                 // crypt 7 -> no liability shift
                 if ($this->getIsVbvRequired()) {
                     $this->_markOrderForCancellation($payment);
+
                     return false;
                 }
                 break;
@@ -414,6 +422,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                 // crypt 6 for mastercard -> no liability shift
                 if ($payment->getCcType() == self::MASTERCARD_CODE && $this->getIsVbvRequired()) {
                     $this->_markOrderForCancellation($payment);
+
                     return false;
                 }
                 break;
@@ -424,6 +433,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             default:
                 // unexpected; abort
                 $this->_markOrderForCancellation($payment);
+
                 return false;
         }
 
@@ -434,6 +444,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Sets a flag in the session so the observer can cancel the order.
      *
      * @param \Magento\Framework\DataObject $payment
+     *
      * @return this
      */
     protected function _markOrderForCancellation($payment)
@@ -444,13 +455,14 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         } else {
             $this->getHelper()->getCheckoutSession()->setMonerisccCancelOrder(true);
         }
-        
+
         return $this;
     }
 
     protected function getUniqueOrderId($increment_id)
     {
         $tail = sprintf("%'920d", rand(999, 999999999 - strlen($increment_id)));
+
         return $increment_id . '-' . $tail;
     }
 
@@ -464,10 +476,11 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
     {
         $this->psrLogger->info("order place redirect");
         $session = $this->getHelper()->getCheckoutSession();
-        $this->psrLogger->info("order id = ".$session->getMonerisccOrderId());
+        $this->psrLogger->info("order id = " . $session->getMonerisccOrderId());
         if ($session->getMonerisccOrderId()) {
             $this->psrLogger->info("call set Status");
             $this->setStatus($session->getMonerisccOrderId());
+
             return $this->getHelper()->getUrl(self::REDIRECT_PATH, ['_secure' => true]);
         }
 
@@ -476,10 +489,12 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             $this->getHelper()->handleError(__('Your card could not be VBV/3DS authenticated. Please use a VBV/3DS enrolled card.'));
 
             $url = $this->getHelper()->getPaymentFailedRedirectUrl();
+
             return $url;
         }
 
         $this->log(__METHOD__ . 'not redirecting');
+
         // TODO probably to return null for mage 2?
         return null;
     }
@@ -488,8 +503,8 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
     {
         $this->psrLogger->info("set status");
         $order = $this->orderModel->loadByIncrementId($incrementId);
-        $this->psrLogger->info("payment type = ".$order->getPayment()->getAdditionalInformation('payment_type'));
-        
+        $this->psrLogger->info("payment type = " . $order->getPayment()->getAdditionalInformation('payment_type'));
+
         if ($order->getPayment()->getAdditionalInformation('payment_type') && $order->getPayment()->getAdditionalInformation('payment_type') == self::AUTHORIZE) {
             $orderStatus = $this->status->loadDefaultByState('pending_payment')->getStatus();
             $order->setState("pending_payment")->setStatus($orderStatus);
@@ -498,34 +513,34 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
         $order->save();
     }
-    
+
     /**
      * Completes payment with the data passed back from the MPI.
      * Throws an exception on failure.
      *
-     * @param \Magento\Framework\DataObject $payment, $paRes, $md, $order
+     * @param \Magento\Framework\DataObject $payment , $paRes, $md, $order
      */
     public function cavvContinue(\Magento\Framework\DataObject $payment, $paRes, $md, $order)
     {
         $this->payment = $payment;
-        $amount = $payment->getAmountOrdered();
-        
+        $amount        = $payment->getAmountOrdered();
+
         $mpiResponse = $this->getHelper()->getObject('Moneris\CreditCard\Model\Mpi\Acs')
-            ->setPaRes($paRes)
-            ->setMd($md)
-            ->setPayment($payment)
-            ->post();
+                            ->setPaRes($paRes)
+                            ->setMd($md)
+                            ->setPayment($payment)
+                            ->post();
 
         $mpiSuccess = $mpiResponse->getMpiSuccess();
         $mpiMessage = $mpiResponse->getMpiMessage();
-        $cavv = $mpiResponse->getMpiCavv();
+        $cavv       = $mpiResponse->getMpiCavv();
 
         if ($mpiMessage != MonerisConstants::CRYPT_RESP_Y) {
             $this->getHelper()->getCheckoutSession()->setMonerisccCancelMessage($mpiMessage);
         }
-        
-        $this->log(__METHOD__ . __LINE__ . ' 3D fetchCryptType'.$mpiMessage);
-        
+
+        $this->log(__METHOD__ . __LINE__ . ' 3D fetchCryptType' . $mpiMessage);
+
         $this->payment->setAdditionalInformation(self::TRANS_STATUS, $mpiMessage);
         $mdArray = [];
         parse_str($md, $mdArray);
@@ -542,14 +557,15 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             } else {
                 $this->_cavvAuthorize($payment, $md, $cavv);
             }
-            
+
             $this->payment->setAdditionalInformation(self::CAVV_FIELD, $cavv);
+
             //$order->sendNewOrderEmail();
 
             return $this;
         }
 
-            //Authentication Not Available
+        //Authentication Not Available
         if ($mpiMessage == MonerisConstants::CRYPT_RESP_U) {
             $this->log(__METHOD__ . 'Authentication Not Available');
             if ($this->getIsVbvRequired()) {
@@ -563,7 +579,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             } else {
                 $this->authorize($payment, $amount);
             }
-            
+
             return $this;
         }
 
@@ -582,11 +598,12 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             $this->getHelper()->handleError($message, true);
         }
 
-            // send regular auth unless vbv is required
+        // send regular auth unless vbv is required
         $this->log(__METHOD__ . 'no mpi');
         if ($this->getIsVbvRequired()) {
             $this->getHelper()->getCheckoutSession()->setMonerisccCancelMessage("3-D Secure authentication failed");
-            $this->getHelper()->handleError(__('3-D Secure authentication failed. Please try again or use a different payment method.'), true);
+            $this->getHelper()->handleError(__('3-D Secure authentication failed. Please try again or use a different payment method.'),
+                true);
         }
 
         if ($mpiSuccess == 'false') {
@@ -609,29 +626,29 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Posts a cavv_preauth transaction.
      * Throws an exception on failure.
      *
-     * @param \Magento\Framework\DataObject $payment, string $md, string $cavv
+     * @param \Magento\Framework\DataObject $payment , string $md, string $cavv
      */
     protected function _cavvAuthorize(\Magento\Framework\DataObject $payment, $md, $cavv)
     {
         $this->payment = $payment;
-        $amount = $payment->getAmountOrdered();
+        $amount        = $payment->getAmountOrdered();
 
         $mdArray = [];
         parse_str($md, $mdArray);
 
-        if (!empty($mdArray) && isset($mdArray['pan'])) {
+        if ( ! empty($mdArray) && isset($mdArray['pan'])) {
             $payment->setCcNumber($mdArray['pan']);
             $transaction = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\Cavv\PreAuth')
-            ->setPayment($payment)
-            ->setAmount($amount)
-            ->setCavv($cavv);
+                                ->setPayment($payment)
+                                ->setAmount($amount)
+                                ->setCavv($cavv);
         } else {
             $transaction = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\Vault\PreAuth')
-            ->setPayment($payment)
-            ->setAmount($amount)
-            ->setCavv($cavv);
+                                ->setPayment($payment)
+                                ->setAmount($amount)
+                                ->setCavv($cavv);
         }
-        
+
         $result = $transaction->post();
         if ($result->getError()) {
             $this->getHelper()->log(__METHOD__ . __LINE__ . ' Error on CAVV authorizing: ' . print_r($result, 1));
@@ -640,9 +657,10 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             $this->getHelper()->getCustomerSession()->setMonerCavvError(true);
         }
 
-        if (!$result->getSuccess()) {
-            $this->getHelper()->log(__FILE__." ".__LINE__." result " .print_r($result, 1));
-            $this->getHelper()->handleError(__('The Transaction has been declined by your bank. Please use a different card or try a different payment method.'), true);
+        if ( ! $result->getSuccess()) {
+            $this->getHelper()->log(__FILE__ . " " . __LINE__ . " result " . print_r($result, 1));
+            $this->getHelper()->handleError(__('The Transaction has been declined by your bank. Please use a different card or try a different payment method.'),
+                true);
         }
 
         $this->_cavvSuccess($payment);
@@ -654,32 +672,32 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Posts a cavv_purchase transaction.
      * Throws an exception on failure.
      *
-     * @param \Magento\Framework\DataObject $payment, string $md, string $cavv
+     * @param \Magento\Framework\DataObject $payment , string $md, string $cavv
      */
     protected function _cavvPurchase(\Magento\Framework\DataObject $payment, $md, $cavv)
     {
         $this->payment = $payment;
-        $session = $this->getHelper()->getCheckoutSession();
-        $incrementId = $session->getMonerisccOrderId();
-        $order = $this->orderModel->loadByIncrementId($incrementId);
-        $amount = $order->getGrandTotal();
+        $session       = $this->getHelper()->getCheckoutSession();
+        $incrementId   = $session->getMonerisccOrderId();
+        $order         = $this->orderModel->loadByIncrementId($incrementId);
+        $amount        = $order->getGrandTotal();
 
         $mdArray = [];
         parse_str($md, $mdArray);
-        
-        if (!empty($mdArray) && isset($mdArray['pan'])) {
+
+        if ( ! empty($mdArray) && isset($mdArray['pan'])) {
             $payment->setCcNumber($mdArray['pan']);
             $transaction = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\Cavv\Purchase')
-            ->setPayment($payment)
-            ->setAmount($amount)
-            ->setCavv($cavv);
+                                ->setPayment($payment)
+                                ->setAmount($amount)
+                                ->setCavv($cavv);
         } else {
             $transaction = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\Vault\Purchase')
-            ->setPayment($payment)
-            ->setAmount($amount)
-            ->setCavv($cavv);
+                                ->setPayment($payment)
+                                ->setAmount($amount)
+                                ->setCavv($cavv);
         }
-        
+
         $result = $transaction->post();
         if ($result->getError()) {
             $this->getHelper()->log(__METHOD__ . __LINE__ . ' Error on CAVV purchase: ' . print_r($result, 1));
@@ -688,16 +706,17 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             $this->getHelper()->handleError($error, true);
         }
 
-        if (!$result->getSuccess()) {
+        if ( ! $result->getSuccess()) {
             $this->getHelper()->log(__METHOD__ . __LINE__ . 'Result 2: ' . print_r($result, 1));
-            $this->getHelper()->handleError(__('The Transaction has been declined by your bank. Please use a different card or try a different payment method.'), true);
+            $this->getHelper()->handleError(__('The Transaction has been declined by your bank. Please use a different card or try a different payment method.'),
+                true);
         }
 
         $this->_cavvSuccess($payment);
 
         // register the capture success
         $payment->setIsTransactionPending(false)
-            ->registerCaptureNotification($amount);
+                ->registerCaptureNotification($amount);
         try {
             $payment->getOrder()->save();
         } catch (\Exception $e) {
@@ -711,6 +730,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Adds a VBV/3DS success message to $payment's order.
      *
      * @param \Magento\Framework\DataObject $payment
+     *
      * @return this
      */
     protected function _cavvSuccess(\Magento\Framework\DataObject $payment)
@@ -726,7 +746,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         } catch (\Exception $e) {
             $this->getHelper()->critical($e);
         }
-        
+
         return $this;
     }
 
@@ -742,6 +762,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
     /**
      * @param \Magento\Framework\DataObject $data
+     *
      * @return $this
      * @throws LocalizedException
      */
@@ -752,7 +773,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         if (isset($data->getData('additional_data')['moneris_checkout_ticket'])) {
             /** @var \Moneris\MonerisCheckout\Helper\Data $monerisCheckoutData */
             $monerisCheckoutData = ObjectManager::getInstance()->get(\Moneris\MonerisCheckout\Helper\Data::class);
-            $receiptData = $monerisCheckoutData->getReceiptData($data->getData('additional_data')['moneris_checkout_ticket']);
+            $receiptData         = $monerisCheckoutData->getReceiptData($data->getData('additional_data')['moneris_checkout_ticket']);
 
             if ($receiptData['response']['success'] === "true") {
                 $info = $this->getInfoInstance();
@@ -777,7 +798,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
         if ($data->hasData('vault_id')
             && $data->getData('vault_id') != ''
-            ) {
+        ) {
             $info->setAdditionalInformation('vault_id', $data->getData('vault_id'));
             $vault = $this->getHelper()->getObject('Moneris\CreditCard\Model\Vault')->load($data->getData('vault_id'));
             if ($vault && $vault->getCardType()) {
@@ -788,7 +809,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                 );
             }
         }
-        
+
         if ($data->hasData('recurringTerm') && $data->getData('recurringTerm') != '') {
             $info->setAdditionalInformation('recurringTerm', $data->getData('recurringTerm'));
         }
@@ -800,7 +821,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         if ($data->hasData('save') && $data->getData('save') != '') {
             $info->setAdditionalInformation('save', $data->getData('save'));
         }
-        
+
         return $this;
     }
 
@@ -814,6 +835,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      *
      * @param \Magento\Framework\DataObject|\Magento\Payment\Model\InfoInterface $payment
      * @param  float $amount
+     *
      * @return void
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -822,18 +844,20 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         try {
             $this->psrLogger->info("auth only");
             $this->payment = $payment;
-            $this->amount = $amount;
+            $this->amount  = $amount;
             $this->psrLogger->info("order id = " . $this->payment->getOrder()->getStatus());
 
             /** @var Registry $register */
             $register = ObjectManager::getInstance()->get(Registry::class);
-            $byPass = $register->registry('by_pass_authorize_payment');
+            $byPass   = $register->registry('by_pass_authorize_payment');
 
             if ($byPass) {
                 $this->recurringOccurence = true;
                 $this->payment->setLastTransId($this->payment->getAdditionalInformation('moneris_receipt_id'));
-                $this->payment->setAdditionalInformation('receipt_id', $this->payment->getAdditionalInformation('moneris_receipt_id'));
+                $this->payment->setAdditionalInformation('receipt_id',
+                    $this->payment->getAdditionalInformation('moneris_receipt_id'));
                 $this->payment->setTransactionId($this->payment->getAdditionalInformation('moneris_trans_id'));
+
                 return $this;
             }
 
@@ -850,15 +874,21 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                     && $receipt['receipt']['result'] === 'a'
                 ) {
                     $this->payment->setAdditionalInformation('moneris_checkout_receipt', $receipt['request']['ticket']);
-                    $this->payment->setAdditionalInformation('moneris_checkout_payment_action', $receipt["receipt"]["cc"]["transaction_code"]);
-                    $this->payment->setAdditionalInformation('moneris_checkout_card_type', $receipt["receipt"]["cc"]["card_type"]);
-                    $this->payment->setAdditionalInformation('moneris_checkout_transaction_date_time', $receipt["receipt"]["cc"]["transaction_date_time"]);
-                    $this->payment->setAdditionalInformation('moneris_checkout_transaction_no', $receipt["receipt"]["cc"]["transaction_no"]);
-                    $this->payment->setAdditionalInformation('moneris_checkout_order_no', $receipt["receipt"]["cc"]["order_no"]);
+                    $this->payment->setAdditionalInformation('moneris_checkout_payment_action',
+                        $receipt["receipt"]["cc"]["transaction_code"]);
+                    $this->payment->setAdditionalInformation('moneris_checkout_card_type',
+                        $receipt["receipt"]["cc"]["card_type"]);
+                    $this->payment->setAdditionalInformation('moneris_checkout_transaction_date_time',
+                        $receipt["receipt"]["cc"]["transaction_date_time"]);
+                    $this->payment->setAdditionalInformation('moneris_checkout_transaction_no',
+                        $receipt["receipt"]["cc"]["transaction_no"]);
+                    $this->payment->setAdditionalInformation('moneris_checkout_order_no',
+                        $receipt["receipt"]["cc"]["order_no"]);
 
                     $this->payment->setAdditionalInformation('receipt_id', $receipt["receipt"]["cc"]["order_no"]);
                     $this->payment->setCcTransId($receipt["receipt"]["cc"]["transaction_no"]);
                     $this->payment->setLastTransId($receipt["receipt"]["cc"]["transaction_no"]);
+
                     //$this->payment->setTransactionId($receipt['receipt']['cc']['reference_no']);
 
                     return $this;
@@ -879,6 +909,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      *
      * @param \Magento\Framework\DataObject|\Magento\Payment\Model\InfoInterface $payment
      * @param float $amount
+     *
      * @return $this
      * @throws \Magento\Framework\Exception\LocalizedException
      */
@@ -888,18 +919,20 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         try {
             $this->psrLogger->info("capture");
             $this->payment = $payment;
-            $this->amount = $amount;
+            $this->amount  = $amount;
 
             /** @var Registry $register */
             $register = ObjectManager::getInstance()->get(Registry::class);
-            $byPass = $register->registry('by_pass_authorize_payment');
+            $byPass   = $register->registry('by_pass_authorize_payment');
 
             if ($byPass) {
                 $this->recurringOccurence = true;
                 $this->payment->setLastTransId($this->payment->getAdditionalInformation('moneris_receipt_id'));
-                $this->payment->setAdditionalInformation('receipt_id', $this->payment->getAdditionalInformation('moneris_receipt_id'));
+                $this->payment->setAdditionalInformation('receipt_id',
+                    $this->payment->getAdditionalInformation('moneris_receipt_id'));
                 $this->payment->setCcTransId($this->payment->getAdditionalInformation('moneris_trans_id'));
                 $this->payment->setTransactionId($this->payment->getAdditionalInformation('moneris_trans_id'));
+
                 return $this;
             }
 
@@ -911,6 +944,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
                     //&& $receipt['request']['txn_total'] >= $this->payment->getOrder()->getGrandTotal()
                 ) {
                     $this->payment->setAdditionalInformation('moneris_checkout_receipt', $receipt['request']['ticket']);
+
                     //$this->payment->setTransactionId($receipt['receipt']['cc']['reference_no']);
 
                     return $this;
@@ -927,7 +961,8 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
     public function processTransaction($paymentType = self::AUTHORIZE)
     {
-        $this->psrLogger->info("payment action = ".$this->getConfigData('payment_action'));
+        $this->psrLogger->info("payment action = " . $this->getConfigData('payment_action'));
+        $currencyCode = $this->getIso4217Code($this->payment->getOrder()->getOrderCurrencyCode());
         $this->payment->setAdditionalInformation('payment_type', $this->getConfigData('payment_action'));
 
         $this->getHelper()->getCheckoutSession()->setMonerisccOrderId(false);
@@ -937,11 +972,11 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
         $this->amount = $this->_getFormattedAmount($this->amount);
 
-        $this->log("CcTransId: ". $this->payment->getCcTransId() .
-            " LastTransId: " . $this->payment->getLastTransId() .
-            " paymentType: $paymentType " .
-            " ParentTransId: " . $this->payment->getParentTransactionId() .
-            " Amount: {$this->amount}  " . $this->payment->getOrder()->getBaseGrandTotal());
+        $this->log("CcTransId: " . $this->payment->getCcTransId() .
+                   " LastTransId: " . $this->payment->getLastTransId() .
+                   " paymentType: $paymentType " .
+                   " ParentTransId: " . $this->payment->getParentTransactionId() .
+                   " Amount: {$this->amount}  " . $this->payment->getOrder()->getBaseGrandTotal());
 
         if ($this->amount < 0) {
             $this->getHelper()->handleError(__("Invalid amount to process: [{$this->amount}]"), true);
@@ -954,13 +989,13 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             $this->saveVaultToCustomerData($this->payment);
         }
 
-        $isRecurring = $this->payment->getAdditionalInformation('recurring');
+        $isRecurring  = $this->payment->getAdditionalInformation('recurring');
         $isCompletion = $paymentType != self::AUTHORIZE && $this->payment->getCcTransId();
 
-        if ($isRecurring && !$isCompletion && empty($this->payment->getAdditionalInformation('vault_id'))) {
-            $vault = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\Vault')
-                ->setPayment($this->payment)
-                ->setCryptType(7);
+        if ($isRecurring && ! $isCompletion && empty($this->payment->getAdditionalInformation('vault_id'))) {
+            $vault  = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\Vault')
+                           ->setPayment($this->payment)
+                           ->setCryptType(7);
             $result = $vault->post(null, false);
 
             if ($result !== null) {
@@ -970,48 +1005,50 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         }
 
         $cryptType = false;
-        
-        if (!$isCompletion) {
+
+        if ( ! $isCompletion) {
             $cryptType = $this->fetchCryptType($this->payment, $this->amount);
         }
 
-        $this->getHelper()->log(__FILE__." ".__LINE__." Process  cryptType: ".$cryptType);
+        $this->getHelper()->log(__FILE__ . " " . __LINE__ . " Process  cryptType: " . $cryptType);
 
-        $this->psrLogger->info("crypt type = ".$cryptType);
-        if (!$isCompletion && !$cryptType) {
-            $this->getHelper()->log(__FILE__." ".__LINE__." Reset CVD result");
+        $this->psrLogger->info("crypt type = " . $cryptType);
+        if ( ! $isCompletion && ! $cryptType) {
+            $this->getHelper()->log(__FILE__ . " " . __LINE__ . " Reset CVD result");
             $this->getHelper()->getCheckoutSession()->setMonerisCavvCvdResult(false);
 
             $this->getHelper()->handleError(__('Only VBV / 3DS enrolled cards are accepted. Please try another card or a different payment method.'));
             $this->payment->setIsTransactionPending(true);
+
             return $this;
         }
 
         if ($this->getIsVbvRequired() && ($cryptType == 6 || $cryptType == 7)) {
             $this->getHelper()->handleError(__('Only VBV / 3DS enrolled cards are accepted. Please try another card or a different payment method.'));
+
             return $this;
         }
 
         if ($paymentType == self::AUTHORIZE) {
             $transaction = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\PreAuth')
-                ->setPayment($this->payment)
-                ->setAmount($this->amount)
-                ->setCryptType($cryptType);
+                                ->setPayment($this->payment)
+                                ->setAmount($this->amount)
+                                ->setCryptType($cryptType);
         } else {
             if ($isCompletion) {
                 if ($this->payment->getOrder()->getData('total_paid') > 0) {
-                    $isReAuth = true;
+                    $isReAuth    = true;
                     $transaction = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\ReAuth');
                 } else {
                     $transaction = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\Completion');
                 }
             } else {
                 $transaction = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\Purchase')
-                    ->setCryptType($cryptType);
+                                    ->setCryptType($cryptType);
             }
 
             $transaction->setPayment($this->payment)
-                ->setAmount($this->amount);
+                        ->setAmount($this->amount);
 
             $cavv = $this->getHelper()->getPaymentAdditionalInfo($this->payment, 'cavv');
             if ($cavv) {
@@ -1019,12 +1056,14 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             }
         }
 
+        $transaction->setData('order_currency_code', $currencyCode);
+
         $this->postTransaction($transaction, $paymentType);
 
-        if (!empty($isReAuth)) {
+        if ( ! empty($isReAuth)) {
             $transaction = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\Completion');
             $transaction->setPayment($this->payment)
-                ->setAmount($this->amount);
+                        ->setAmount($this->amount);
 
             $cavv = $this->getHelper()->getPaymentAdditionalInfo($this->payment, 'cavv');
             if ($cavv) {
@@ -1046,8 +1085,8 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             $this->getHelper()->handleError($error, true);
         }
 
-        if (!$result->getSuccess()) {
-            $this->getHelper()->handleError(__('Error in processing payment: '. $result->getMessage()), true);
+        if ( ! $result->getSuccess()) {
+            $this->getHelper()->handleError(__('Error in processing payment: ' . $result->getMessage()), true);
         } else {
             $this->log(__METHOD__ . " success ! ");
         }
@@ -1061,29 +1100,182 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
         if (self::AUTHORIZE != $paymentType) {
             $this->payment->setIsTransactionClosed(0)
-                ->setTransactionAdditionalInfo(
-                    self::REAL_TRANSACTION_ID_KEY,
-                    $this->payment->getLastTransId()
-                );
+                          ->setTransactionAdditionalInfo(
+                              self::REAL_TRANSACTION_ID_KEY,
+                              $this->payment->getLastTransId()
+                          );
         }
     }
 
+    public function getRateToken($store_id, $api_token, $amount, $card_currency, $merchant_currency, $test_mode = true)
+    {
+        /**************************** Request Variables *******************************/
+        /*
+        $store_id='store5';
+        $api_token='yesguy';
+
+        */
+        $type          = 'mcp_get_rate';
+        $mcp_version   = '1.0';
+        $rate_txn_type = 'P';
+        /*********************** Transactional Associative Array **********************/
+        $txnArray = array(
+            'type'          => $type,
+            'mcp_version'   => $mcp_version,
+            'rate_txn_type' => $rate_txn_type
+        );
+        /**************************** Transaction Object *****************************/
+        $mpgTxn = new SDK\mpgTransaction($txnArray);
+        /******************* Credential on File **********************************/
+        $mcpRate = new SDK\MCPRate();
+        $mcpRate->setCardholderAmount($amount, $card_currency);
+        $mcpRate->setMerchantSettlementAmount($amount, $merchant_currency);
+        $mpgTxn->setMCPRateInfo($mcpRate);
+        /****************************** Request Object *******************************/
+        $mpgRequest = new SDK\mpgRequest($mpgTxn);
+        $mpgRequest->setProcCountryCode("CA"); //"US" for sending transaction to US environment
+        $mpgRequest->setTestMode($test_mode); //false or comment out this line for production transactions
+        /***************************** HTTPS Post Object *****************************/
+        /* Status Check Example
+        $mpgHttpPost  =new mpgHttpsPostStatus($store_id,$api_token,$status_check,$mpgRequest);
+        */
+        $mpgHttpPost = new SDK\mpgHttpsPost($store_id, $api_token, $mpgRequest);
+        /******************************* Response ************************************/
+        $mpgResponse = $mpgHttpPost->getMpgResponse();
+
+        return $mpgResponse->getMCPRateToken();
+    }
+
+    protected function getIso4217Code($code)
+    {
+        $code = strtoupper($code);
+        $isoCodes = array(
+            'AFA' => array('Afghan Afghani', '971'),
+            'AWG' => array('Aruban Florin', '533'),
+            'AUD' => array('Australian Dollars', '036'),
+            'ARS' => array('Argentine Pes', '032'),
+            'AZN' => array('Azerbaijanian Manat', '944'),
+            'BSD' => array('Bahamian Dollar', '044'),
+            'BDT' => array('Bangladeshi Taka', '050'),
+            'BBD' => array('Barbados Dollar', '052'),
+            'BYR' => array('Belarussian Rouble', '974'),
+            'BOB' => array('Bolivian Boliviano', '068'),
+            'BRL' => array('Brazilian Real', '986'),
+            'GBP' => array('British Pounds Sterling', '826'),
+            'BGN' => array('Bulgarian Lev', '975'),
+            'KHR' => array('Cambodia Riel', '116'),
+            'CAD' => array('Canadian Dollars', '124'),
+            'KYD' => array('Cayman Islands Dollar', '136'),
+            'CLP' => array('Chilean Peso', '152'),
+            'CNY' => array('Chinese Renminbi Yuan', '156'),
+            'COP' => array('Colombian Peso', '170'),
+            'CRC' => array('Costa Rican Colon', '188'),
+            'HRK' => array('Croatia Kuna', '191'),
+            'CPY' => array('Cypriot Pounds', '196'),
+            'CZK' => array('Czech Koruna', '203'),
+            'DKK' => array('Danish Krone', '208'),
+            'DOP' => array('Dominican Republic Peso', '214'),
+            'XCD' => array('East Caribbean Dollar', '951'),
+            'EGP' => array('Egyptian Pound', '818'),
+            'ERN' => array('Eritrean Nakfa', '232'),
+            'EEK' => array('Estonia Kroon', '233'),
+            'EUR' => array('Euro', '978'),
+            'GEL' => array('Georgian Lari', '981'),
+            'GHC' => array('Ghana Cedi', '288'),
+            'GIP' => array('Gibraltar Pound', '292'),
+            'GTQ' => array('Guatemala Quetzal', '320'),
+            'HNL' => array('Honduras Lempira', '340'),
+            'HKD' => array('Hong Kong Dollars', '344'),
+            'HUF' => array('Hungary Forint', '348'),
+            'ISK' => array('Icelandic Krona', '352'),
+            'INR' => array('Indian Rupee', '356'),
+            'IDR' => array('Indonesia Rupiah', '360'),
+            'ILS' => array('Israel Shekel', '376'),
+            'JMD' => array('Jamaican Dollar', '388'),
+            'JPY' => array('Japanese yen', '392'),
+            'KZT' => array('Kazakhstan Tenge', '368'),
+            'KES' => array('Kenyan Shilling', '404'),
+            'KWD' => array('Kuwaiti Dinar', '414'),
+            'LVL' => array('Latvia Lat', '428'),
+            'LBP' => array('Lebanese Pound', '422'),
+            'LTL' => array('Lithuania Litas', '440'),
+            'MOP' => array('Macau Pataca', '446'),
+            'MKD' => array('Macedonian Denar', '807'),
+            'MGA' => array('Malagascy Ariary', '969'),
+            'MYR' => array('Malaysian Ringgit', '458'),
+            'MTL' => array('Maltese Lira', '470'),
+            'BAM' => array('Marka', '977'),
+            'MUR' => array('Mauritius Rupee', '480'),
+            'MXN' => array('Mexican Pesos', '484'),
+            'MZM' => array('Mozambique Metical', '508'),
+            'NPR' => array('Nepalese Rupee', '524'),
+            'ANG' => array('Netherlands Antilles Guilder', '532'),
+            'TWD' => array('New Taiwanese Dollars', '901'),
+            'NZD' => array('New Zealand Dollars', '554'),
+            'NIO' => array('Nicaragua Cordoba', '558'),
+            'NGN' => array('Nigeria Naira', '566'),
+            'KPW' => array('North Korean Won', '408'),
+            'NOK' => array('Norwegian Krone', '578'),
+            'OMR' => array('Omani Riyal', '512'),
+            'PKR' => array('Pakistani Rupee', '586'),
+            'PYG' => array('Paraguay Guarani', '600'),
+            'PEN' => array('Peru New Sol', '604'),
+            'PHP' => array('Philippine Pesos', '608'),
+            'QAR' => array('Qatari Riyal', '634'),
+            'RON' => array('Romanian New Leu', '946'),
+            'RUB' => array('Russian Federation Ruble', '643'),
+            'SAR' => array('Saudi Riyal', '682'),
+            'CSD' => array('Serbian Dinar', '891'),
+            'SCR' => array('Seychelles Rupee', '690'),
+            'SGD' => array('Singapore Dollars', '702'),
+            'SKK' => array('Slovak Koruna', '703'),
+            'SIT' => array('Slovenia Tolar', '705'),
+            'ZAR' => array('South African Rand', '710'),
+            'KRW' => array('South Korean Won', '410'),
+            'LKR' => array('Sri Lankan Rupee', '144'),
+            'SRD' => array('Surinam Dollar', '968'),
+            'SEK' => array('Swedish Krona', '752'),
+            'CHF' => array('Swiss Francs', '756'),
+            'TZS' => array('Tanzanian Shilling', '834'),
+            'THB' => array('Thai Baht', '764'),
+            'TTD' => array('Trinidad and Tobago Dollar', '780'),
+            'TRY' => array('Turkish New Lira', '949'),
+            'AED' => array('UAE Dirham', '784'),
+            'USD' => array('US Dollars', '840'),
+            'UGX' => array('Ugandian Shilling', '800'),
+            'UAH' => array('Ukraine Hryvna', '980'),
+            'UYU' => array('Uruguayan Peso', '858'),
+            'UZS' => array('Uzbekistani Som', '860'),
+            'VEB' => array('Venezuela Bolivar', '862'),
+            'VND' => array('Vietnam Dong', '704'),
+            'AMK' => array('Zambian Kwacha', '894'),
+            'ZWD' => array('Zimbabwe Dollar', '716'),
+        );
+
+        if (isset($isoCodes[$code])) {
+            return $isoCodes[$code][1];
+        }
+
+        return false;
+    }
     /**
      * Save a credit Card to Customer Vault.
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
+     *
      * @return $this
      */
     private function saveVaultToCustomerData(\Magento\Payment\Model\InfoInterface $payment)
     {
-        if (!$payment) {
+        if ( ! $payment) {
             return [];
         }
-        
-        $vault = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\Vault')
-        ->setPayment($payment)
-        ->setCryptType(7);
+
+        $vault  = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\Vault')
+                       ->setPayment($payment)
+                       ->setCryptType(7);
         $result = $vault->post();
+
         return $this;
     }
 
@@ -1091,14 +1283,30 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
     /**
      * Sends a refund transaction.
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment, float $amount
+     * @param \Magento\Payment\Model\InfoInterface $payment , float $amount
+     *
      * @return $this
      * @throws Exception
      */
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         $this->payment = $payment;
-        $this->amount = $this->_getFormattedAmount($amount);
+        $order = $payment->getOrder();
+        $currencyCode = $order->getOrderCurrencyCode();
+        $this->amount  = $this->_getFormattedAmount($amount);
+
+
+        $rateToken = $this->getRateToken(
+            $this->chHelper->getMonerisStoreId(),
+            $this->chHelper->getMonerisApiToken(),
+            $amount,
+            $this->getIso4217Code($currencyCode),
+            $this->getIso4217Code($order->getBaseCurrencyCode()),
+            $this->chHelper->isCCTestMode()
+        );
+
+        $payment->setAdditionalInformation('rate_token', $rateToken);
+        $this->payment = $payment;
 
         if ($this->amount <= 0) {
             $error = __('Error in refunding payment: amount (%s) cannot be 0 or less.', $amount);
@@ -1106,12 +1314,12 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         }
 
         $transaction = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\Refund')
-            ->setPayment($payment)
-            ->setAmount($amount);
+                            ->setPayment($payment)
+                            ->setAmount($amount);
 
         $result = $transaction->post();
 
-        if (!$result->getSuccess()) {
+        if ( ! $result->getSuccess()) {
             $this->getHelper()->handleError(__('Error in refunding payment: ' . $result->getMessage()), true);
         }
 
@@ -1122,7 +1330,8 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
     /**
      * Sends a void transaction.
      *
-     * @param \Magento\Payment\Model\InfoInterface $payment, float $amount
+     * @param \Magento\Payment\Model\InfoInterface $payment , float $amount
+     *
      * @return $this
      * @throws Exception
      */
@@ -1130,7 +1339,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
     {
         $this->payment = $payment;
 
-        if (!$payment->getLastTransId()) {
+        if ( ! $payment->getLastTransId()) {
             $payment->setStatus(self::STATUS_ERROR);
 
             throw new \Magento\Framework\Exception\LocalizedException(
@@ -1139,17 +1348,16 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         }
 
         $transaction = $this->getHelper()->getObject('Moneris\CreditCard\Model\Transaction\VoidTransaction')
-            ->setPayment($payment)
-            ->setAmount(0);
-        $result = $transaction->post();
-        if (!$result->getSuccess()) {
+                            ->setPayment($payment)
+                            ->setAmount(0);
+        $result      = $transaction->post();
+        if ( ! $result->getSuccess()) {
             $payment->setStatus(self::STATUS_ERROR);
             $this->getHelper()->handleError(__('Error in voiding payment: ' . $result->getMessage()), true);
         }
 
         return $this;
     }
-
 
 
     /**
@@ -1167,6 +1375,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      *
      * @param string $paymentAction
      * @param \Magento\Framework\DataObject $stateObject
+     *
      * @return void
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -1179,8 +1388,8 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             //intentional
             case self::ACTION_AUTHORIZE_CAPTURE:
                 $requestType = $requestType ?: self::REQUEST_TYPE_AUTH_CAPTURE;
-                $payment = $this->getInfoInstance();
-                $order = $payment->getOrder();
+                $payment     = $this->getInfoInstance();
+                $order       = $payment->getOrder();
                 $order->setCanSendNewEmailFlag(false);
                 $payment->setBaseAmountAuthorized($order->getBaseTotalDue());
                 $payment->setAmountAuthorized($order->getTotalDue());
@@ -1195,14 +1404,15 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Generate request object and fill its fields from Quote or Order object
      *
      * @param \Magento\Sales\Model\Order $order Quote or order object.
+     *
      * @return \Magento\Authorizenet\Model\Directpost\Request
      */
     public function generateRequestFromOrder(\Magento\Sales\Model\Order $order)
     {
         $request = $this->requestFactory->create()
-            ->setConstantData($this)
-            ->setDataFromOrder($order, $this)
-            ->signRequestData();
+                                        ->setConstantData($this)
+                                        ->setDataFromOrder($order, $this)
+                                        ->signRequestData();
 
         $this->_debug(['request' => $request->getData()]);
 
@@ -1213,11 +1423,13 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Fill response with data.
      *
      * @param array $postData
+     *
      * @return $this
      */
     public function setResponseData(array $postData)
     {
         $this->getResponse()->setData($postData);
+
         return $this;
     }
 
@@ -1231,9 +1443,9 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
     {
         $response = $this->getResponse();
         //md5 check
-        if (!$this->getConfigData('trans_md5')
-            || !$this->getConfigData('login')
-            || !$response->isValidHash($this->getConfigData('trans_md5'), $this->getConfigData('login'))
+        if ( ! $this->getConfigData('trans_md5')
+             || ! $this->getConfigData('login')
+             || ! $response->isValidHash($this->getConfigData('trans_md5'), $this->getConfigData('login'))
         ) {
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('The transaction was declined because the response hash validation failed.')
@@ -1247,6 +1459,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Operate with order using data from $_POST which came from authorize.net by Relay URL.
      *
      * @param array $responseData data from Authorize.net from $_POST
+     *
      * @return void
      * @throws \Magento\Framework\Exception\LocalizedException In case of validation error or order creation error
      */
@@ -1258,19 +1471,19 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
         $this->validateResponse();
 
-        $response = $this->getResponse();
+        $response         = $this->getResponse();
         $orderIncrementId = $response->getXInvoiceNum();
-        $responseText = $this->dataHelper->wrapGatewayError($response->getXResponseReasonText());
-        $isError = false;
+        $responseText     = $this->dataHelper->wrapGatewayError($response->getXResponseReasonText());
+        $isError          = false;
         if ($orderIncrementId) {
-            $order = $this->orderFactory->create()->loadByIncrementId($orderIncrementId);
+            $order   = $this->orderFactory->create()->loadByIncrementId($orderIncrementId);
             $payment = $order->getPayment();
-            if (!$payment || $payment->getMethod() != $this->getCode()) {
+            if ( ! $payment || $payment->getMethod() != $this->getCode()) {
                 throw new \Magento\Framework\Exception\LocalizedException(
                     __('This payment didn\'t work out because we can\'t find this order.')
                 );
             }
-            
+
             if ($order->getId()) {
                 //operate with order
                 $this->processOrder($order);
@@ -1282,7 +1495,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         }
 
         if ($isError) {
-            $responseText = $responseText && !$response->isApproved()
+            $responseText = $responseText && ! $response->isApproved()
                 ? $responseText
                 : __('This payment didn\'t work out because we can\'t find this order.');
             throw new \Magento\Framework\Exception\LocalizedException($responseText);
@@ -1293,24 +1506,25 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Fill payment with credit card data from response from Authorize.net.
      *
      * @param \Magento\Framework\DataObject $payment
+     *
      * @return void
      */
     protected function fillPaymentByResponse(\Magento\Framework\DataObject $payment)
     {
         $response = $this->getResponse();
         $payment->setTransactionId($response->getXTransId())
-            ->setParentTransactionId(null)
-            ->setIsTransactionClosed(0)
-            ->setTransactionAdditionalInfo('real_transaction_id', $response->getXTransId());
+                ->setParentTransactionId(null)
+                ->setIsTransactionClosed(0)
+                ->setTransactionAdditionalInfo('real_transaction_id', $response->getXTransId());
 
         if ($response->getXMethod() == self::REQUEST_METHOD_CC) {
             $payment->setCcAvsStatus($response->getXAvsCode())
-                ->setCcLast4($payment->encrypt(substr($response->getXAccountNumber(), -4)));
+                    ->setCcLast4($payment->encrypt(substr($response->getXAccountNumber(), -4)));
         }
 
         if ($response->getXResponseCode() == self::RESPONSE_CODE_HELD) {
             $payment->setIsTransactionPending(true)
-                ->setIsFraudDetected(true);
+                    ->setIsFraudDetected(true);
         }
     }
 
@@ -1346,12 +1560,12 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      */
     public function checkTransId()
     {
-        if (!$this->getResponse()->getXTransId()) {
+        if ( ! $this->getResponse()->getXTransId()) {
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('Please enter a transaction ID to authorize this payment.')
             );
         }
-        
+
         return true;
     }
 
@@ -1359,6 +1573,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Compare amount with amount from the response from Authorize.net.
      *
      * @param float $amount
+     *
      * @return bool
      */
     protected function matchAmount($amount)
@@ -1371,6 +1586,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Authorize order or authorize and capture it.
      *
      * @param \Magento\Sales\Model\Order $order
+     *
      * @return void
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Exception
@@ -1402,7 +1618,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
         //match amounts. should be equals for authorization.
         //decline the order if amount does not match.
-        if (!$this->matchAmount($payment->getBaseAmountAuthorized())) {
+        if ( ! $this->matchAmount($payment->getBaseAmountAuthorized())) {
             $message = __(
                 'Something went wrong: the paid amount doesn\'t match the order amount.'
                 . ' Please correct this and try again.'
@@ -1412,7 +1628,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         }
 
         try {
-            if (!$response->hasOrderSendConfirmation() || $response->getOrderSendConfirmation()) {
+            if ( ! $response->hasOrderSendConfirmation() || $response->getOrderSendConfirmation()) {
                 $this->orderSender->send($order);
             }
 
@@ -1427,17 +1643,19 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Process fraud status
      *
      * @param \Magento\Sales\Model\Order\Payment $payment
+     *
      * @return $this
      */
     protected function processPaymentFraudStatus(\Magento\Sales\Model\Order\Payment $payment)
     {
         try {
             $fraudDetailsResponse = $payment->getMethodInstance()
-                ->fetchTransactionFraudDetails($this->getResponse()->getXTransId());
-            $fraudData = $fraudDetailsResponse->getData();
+                                            ->fetchTransactionFraudDetails($this->getResponse()->getXTransId());
+            $fraudData            = $fraudDetailsResponse->getData();
 
             if (empty($fraudData)) {
                 $payment->setIsFraudDetected(false);
+
                 return $this;
             }
 
@@ -1454,20 +1672,21 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Add status comment
      *
      * @param \Magento\Sales\Model\Order\Payment $payment
+     *
      * @return $this
      */
     protected function addStatusComment(\Magento\Sales\Model\Order\Payment $payment)
     {
         try {
-            $transactionId = $this->getResponse()->getXTransId();
-            $data = $payment->getMethodInstance()->getTransactionDetails($transactionId);
+            $transactionId     = $this->getResponse()->getXTransId();
+            $data              = $payment->getMethodInstance()->getTransactionDetails($transactionId);
             $transactionStatus = (string)$data->transaction->transactionStatus;
-            $fdsFilterAction = (string)$data->transaction->FDSFilterAction;
+            $fdsFilterAction   = (string)$data->transaction->FDSFilterAction;
 
             if ($payment->getIsTransactionPending()) {
                 $message = 'Amount of %1 is pending approval on the gateway.<br/>'
-                    . 'Transaction "%2" status is "%3".<br/>'
-                    . 'Transaction FDS Filter Action is "%4"';
+                           . 'Transaction "%2" status is "%3".<br/>'
+                           . 'Transaction FDS Filter Action is "%4"';
                 $message = __(
                     $message,
                     $payment->getOrder()->getBaseCurrency()->formatTxt($this->getResponse()->getXAmount()),
@@ -1480,7 +1699,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         } catch (\Exception $e) {
             $this->getHelper()->log(__METHOD__ . __LINE__);
         }
-        
+
         return $this;
     }
 
@@ -1490,6 +1709,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * @param \Magento\Sales\Model\Order $order
      * @param string $message
      * @param bool $voidPayment
+     *
      * @return void
      */
     protected function declineOrder(\Magento\Sales\Model\Order $order, $message = '', $voidPayment = true)
@@ -1510,6 +1730,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Return additional information`s transaction_id value of parent transaction model
      *
      * @param \Magento\Sales\Model\Order\Payment $payment
+     *
      * @return string
      */
     protected function getRealParentTransactionId($payment)
@@ -1519,6 +1740,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             $payment->getId(),
             $payment->getOrder()->getId()
         );
+
         return $transaction->getAdditionalInformation(self::REAL_TRANSACTION_ID_KEY);
     }
 
@@ -1535,6 +1757,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      *
      * @param mixed $key
      * @param null $storeId
+     *
      * @return mixed
      */
     public function getValue($key, $storeId = null)
@@ -1546,6 +1769,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * Set initialization requirement state
      *
      * @param bool $isInitializeNeeded
+     *
      * @return void
      */
     public function setIsInitializeNeeded($isInitializeNeeded = true)
@@ -1560,7 +1784,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      */
     public function canCapture()
     {
-        return !$this->isGatewayActionsLocked($this->getInfoInstance());
+        return ! $this->isGatewayActionsLocked($this->getInfoInstance());
     }
 
     /**
@@ -1570,6 +1794,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @param string $transactionId
+     *
      * @return array
      */
     public function fetchTransactionInfo(\Magento\Payment\Model\InfoInterface $payment, $transactionId)
@@ -1593,8 +1818,9 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
         } elseif ($response->getXResponseReasonCode() == self::RESPONSE_REASON_CODE_PENDING_REVIEW_DECLINED) {
             $payment->setIsTransactionDenied(true);
         }
-        
+
         $this->addStatusCommentOnUpdate($payment, $response, $transactionId);
+
         return [];
     }
 
@@ -1602,6 +1828,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * @param \Magento\Sales\Model\Order\Payment $payment
      * @param \Magento\Framework\DataObject $response
      * @param string $transactionId
+     *
      * @return $this
      */
     protected function addStatusCommentOnUpdate(
@@ -1626,7 +1853,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
             );
             $payment->getOrder()->addStatusHistoryComment($message);
         }
-        
+
         return $this;
     }
 
@@ -1634,6 +1861,7 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
      * This function returns full transaction details for a specified transaction ID.
      *
      * @param string $transactionId
+     *
      * @return \Magento\Framework\DataObject
      * @throws \Magento\Framework\Exception\LocalizedException
      * @link http://www.authorize.net/support/ReportingGuide_XML.pdf
@@ -1645,16 +1873,17 @@ class Payment extends AbstractPayment implements TransparentInterface, ConfigInt
 
         $response = $this->responseFactory->create();
         $response->setXResponseCode((string)$responseXmlDocument->transaction->responseCode)
-            ->setXResponseReasonCode((string)$responseXmlDocument->transaction->responseReasonCode)
-            ->setTransactionStatus((string)$responseXmlDocument->transaction->transactionStatus);
+                 ->setXResponseReasonCode((string)$responseXmlDocument->transaction->responseReasonCode)
+                 ->setTransactionStatus((string)$responseXmlDocument->transaction->transactionStatus);
 
         return $response;
     }
-    
+
     /**
      * If gateway actions are locked return true
      *
      * @param  \Magento\Payment\Model\InfoInterface $payment
+     *
      * @return bool
      */
     protected function isGatewayActionsLocked($payment)

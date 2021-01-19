@@ -42,11 +42,11 @@ abstract class AbstractModel extends \Magento\Framework\Model\AbstractModel
     //  trasn types
     const CAVV_PURCHASE = 'cavv_purchase';
     const CAVV_PREAUTH = 'cavv_preauth';
-    const PREAUTH = 'preauth';
-    const COMPLETION = 'completion';
-    const REFUND = 'refund';
+    const PREAUTH = 'mcp_preauth';
+    const COMPLETION = 'mcp_completion';
+    const REFUND = 'mcp_refund';
     const PURCHASE_CORRECTION = 'purchasecorrection';
-    const PURCHASE = 'purchase';
+    const PURCHASE = 'mcp_purchase';
     const US_PREFIX = "us_";
     const COMPLETION_US = 'us_completion';
     const REAL_TRANSACTION_ID_KEY  = 'real_transaction_id';

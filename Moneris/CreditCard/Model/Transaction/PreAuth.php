@@ -86,8 +86,12 @@ class PreAuth extends Transaction
             'order_id'      => $this->generateUniqueOrderId(),
             'cust_id'       => $this->getCustomerId(),
             'amount'        => $this->getAmount(),
+            'cardholder_amount'        => $this->getAmount(),
+            'cardholder_currency_code'        => $this->getData('order_currency_code'),
+            'mcp_rate_token'        => '',
             'pan'           => $ccNumber,
             'expdate'       => $this->getFormattedExpiry($payment),
+            'mcp_version'       => self::MCP_VERSION,
             self::CRYPT_FIELD   => $this->getCryptType()
         ];
 

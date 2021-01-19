@@ -45,6 +45,7 @@ class Refund extends Transaction
             'cust_id'       => $custId,
             'mcp_version'   => Transaction::MCP_VERSION,
             'cardholder_amount' => $this->getAmount(),
+            'mcp_rate_token'=> $this->payment->getAdditionalInformation('rate_token'),
             'cardholder_currency_code' => $this->getIso4217Code($currencyCode),
             'amount'        => $this->getAmount(),
             'crypt_type'    => $this->getCryptType() ? $this->getCryptType() : self::CRYPT_FIVE,

@@ -38,10 +38,12 @@ class Completion extends Transaction
             'type'              => $this->_requestType,
             'order_id'          => $monerisOrderId,
             'cust_id'       => $custId,
-            'comp_amount'       => $this->getAmount(),
+            'comp_amount'       => intval($this->getAmount()),
+            'cardholder_amount'       => intval($this->getAmount()),
+            'mcp_rate_token'       => '',
             'mcp_version'   => Transaction::MCP_VERSION,
             'cardholder_currency_code' => $this->getIso4217Code($currencyCode),
-            self::CRYPT_FIELD   => $this->getCryptType(),
+            self::CRYPT_FIELD   => '7',
             'txn_number'        => $payment->getCcTransId()
         ];
     }

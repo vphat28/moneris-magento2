@@ -1,11 +1,11 @@
 {
   "name": "moneris/moneris-payment-solution",
   "description": "Moneris Payment Methods suite",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "metapackage",
   "require": {
     "moneris/module-creditcard": ">=3.0.6",
-    "moneris/module-monerischeckout": ">=0.0.4"
+    "moneris/module-monerischeckout": ">=0.0.5"
   },
   "license": [
     "OSL-3.0",

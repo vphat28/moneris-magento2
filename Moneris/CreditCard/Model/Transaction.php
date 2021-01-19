@@ -456,9 +456,10 @@ class Transaction extends AbstractModel
             if (!$txnArray) {
                 $txnArray = $this->buildTransactionArray();
             }
-            file_put_contents(BP . '/var/log/ch_moneris.log', PHP_EOL . print_r($txnArray, 1), FILE_APPEND);
+            file_put_contents(BP . '/var/log/ch_moneris.log', PHP_EOL . 'API REquest ' . print_r($txnArray, 1), FILE_APPEND);
             $result = $this->_post($txnArray, $save);
             $this->setResult($result);
+            file_put_contents(BP . '/var/log/ch_moneris.log', PHP_EOL . 'API Response ' .print_r($result, 1), FILE_APPEND);
         } catch (\Exception $e) {
             $this->getHelper()->critical($e);
         }
