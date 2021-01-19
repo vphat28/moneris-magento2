@@ -8,7 +8,7 @@
         "lib-libxml": "*"
     },
     "type": "magento2-module",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "license": [
         "CH-1.0"
     ],
