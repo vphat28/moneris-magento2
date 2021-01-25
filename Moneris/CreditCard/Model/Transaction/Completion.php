@@ -42,7 +42,8 @@ class Completion extends Transaction
             'cardholder_amount'       => intval($this->getAmount()),
             'mcp_rate_token'       => '',
             'mcp_version'   => Transaction::MCP_VERSION,
-            'cardholder_currency_code' => $this->getIso4217Code($currencyCode),
+//            'cardholder_currency_code' => $this->getIso4217Code($currencyCode),
+            'cardholder_currency_code' => '826',
             self::CRYPT_FIELD   => '7',
             'txn_number'        => $payment->getCcTransId()
         ];
